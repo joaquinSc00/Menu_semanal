@@ -1,0 +1,366 @@
+:root {
+  --bg: #f6f0e6;
+  --bg-accent: #ead4b3;
+  --panel: rgba(255, 252, 246, 0.88);
+  --panel-strong: #fff9ef;
+  --text: #2a231d;
+  --muted: #6c6055;
+  --line: rgba(101, 77, 46, 0.16);
+  --brand: #9c3d24;
+  --brand-strong: #7e2c18;
+  --accent: #40624a;
+  --accent-soft: #dce9de;
+  --warn: #8a5c16;
+  --warn-soft: #f4e7c4;
+  --danger: #a73730;
+  --danger-soft: #f4d9d6;
+  --shadow: 0 24px 60px rgba(69, 45, 16, 0.14);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Nunito", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.75), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(234, 212, 179, 0.75), transparent 28%),
+    linear-gradient(160deg, #f4ebdf 0%, #f8f5ee 48%, #efe1ca 100%);
+}
+
+button {
+  font: inherit;
+}
+
+.page-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+
+.hero {
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, rgba(156, 61, 36, 0.94), rgba(83, 49, 29, 0.92)),
+    linear-gradient(135deg, #bf6844, #68442a);
+  color: #fff8f0;
+  box-shadow: var(--shadow);
+}
+
+.eyebrow,
+.label,
+.note,
+.meal-day,
+.history-meta {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.eyebrow,
+.label,
+.note {
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.hero h1,
+.panel h2,
+.recipe-title {
+  margin: 0;
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 0.95;
+  margin-top: 8px;
+}
+
+.hero-copy {
+  max-width: 760px;
+  margin: 16px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: rgba(255, 248, 240, 0.9);
+}
+
+.layout {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1.25fr 1fr;
+  margin-top: 20px;
+}
+
+.status-panel,
+.history-panel {
+  grid-column: span 2;
+}
+
+.panel {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+}
+
+.status-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.status-grid.secondary {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.value {
+  margin: 6px 0 0;
+  font-size: 1.55rem;
+  font-weight: 800;
+}
+
+.value.small {
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.turn-switch,
+.actions,
+.panel-head,
+.recipe-topline,
+.tag-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.turn-button,
+.secondary-button,
+.select-button {
+  border: 0;
+  border-radius: 999px;
+  transition: transform 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+  cursor: pointer;
+}
+
+.turn-button {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.turn-button.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 8px 20px rgba(64, 98, 74, 0.22);
+}
+
+.actions {
+  margin-top: 20px;
+}
+
+.secondary-button,
+.select-button {
+  padding: 12px 18px;
+  font-weight: 800;
+}
+
+.secondary-button {
+  background: var(--panel-strong);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.secondary-button.danger {
+  color: var(--danger);
+}
+
+.secondary-button:hover,
+.turn-button:hover,
+.select-button:hover {
+  transform: translateY(-1px);
+}
+
+.panel-head {
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 18px;
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+  max-width: 280px;
+  text-align: right;
+}
+
+.recipes-list,
+.history-list {
+  display: grid;
+  gap: 14px;
+}
+
+.recipe-card,
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+}
+
+.recipe-card.blocked {
+  opacity: 0.7;
+  background: #f6ede7;
+}
+
+.recipe-main {
+  flex: 1;
+}
+
+.priority-pill,
+.history-turn,
+.tag,
+.reason {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.priority-high {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.priority-medium {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.priority-low,
+.priority-blocked {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.meal-day {
+  color: var(--muted);
+  font-size: 0.76rem;
+  align-self: center;
+}
+
+.recipe-title {
+  margin-top: 12px;
+  font-size: 1.2rem;
+}
+
+.recipe-description {
+  margin: 10px 0 0;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.tag,
+.reason {
+  margin-top: 12px;
+}
+
+.tag {
+  background: rgba(64, 98, 74, 0.09);
+  color: var(--accent);
+}
+
+.reason {
+  background: rgba(156, 61, 36, 0.1);
+  color: var(--brand);
+}
+
+.select-button {
+  align-self: center;
+  min-width: 118px;
+  background: var(--brand);
+  color: white;
+  box-shadow: 0 10px 20px rgba(156, 61, 36, 0.18);
+}
+
+.recipe-card.blocked .select-button {
+  background: #b8a195;
+  box-shadow: none;
+}
+
+.history-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.history-meta {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.history-turn {
+  background: rgba(42, 35, 29, 0.08);
+  color: var(--text);
+}
+
+@media (max-width: 920px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .status-panel,
+  .history-panel {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    width: min(100% - 20px, 1180px);
+    padding-top: 18px;
+  }
+
+  .hero,
+  .panel {
+    padding: 20px;
+  }
+
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-card,
+  .history-item {
+    flex-direction: column;
+  }
+
+  .select-button {
+    width: 100%;
+  }
+
+  .note {
+    text-align: left;
+  }
+}

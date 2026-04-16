@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Semanal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <p class="eyebrow">Rotacion inteligente de comidas</p>
+      <h1>Que comemos hoy</h1>
+      <p class="hero-copy">
+        La pagina prioriza recetas que no repitan lo ultimo que comieron y manda al fondo
+        lo que use pechuga, lentejas o ingredientes muy recientes.
+      </p>
+    </header>
+
+    <main class="layout">
+      <section class="panel status-panel">
+        <div class="status-grid">
+          <div>
+            <p class="label">Dia actual</p>
+            <p class="value" id="current-day">-</p>
+          </div>
+          <div>
+            <p class="label">Turno</p>
+            <div class="turn-switch" role="group" aria-label="Cambiar turno">
+              <button class="turn-button" id="lunch-button" type="button">Almuerzo</button>
+              <button class="turn-button" id="dinner-button" type="button">Cena</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-grid secondary">
+          <div>
+            <p class="label">Ultima comida</p>
+            <p class="value small" id="last-meal">Todavia no hay historial.</p>
+          </div>
+          <div>
+            <p class="label">Criterio actual</p>
+            <p class="value small" id="priority-summary">Se muestran primero las opciones menos repetidas.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="secondary-button" id="undo-button" type="button">Deshacer ultima seleccion</button>
+          <button class="secondary-button danger" id="reset-button" type="button">Reiniciar semana</button>
+        </div>
+      </section>
+
+      <section class="panel recipes-panel">
+        <div class="panel-head">
+          <div>
+            <p class="label">Opciones sugeridas</p>
+            <h2 id="recipes-title">Almuerzo</h2>
+          </div>
+          <p class="note">La receta exacta recien usada se bloquea por algunos turnos.</p>
+        </div>
+
+        <div class="recipes-list" id="recipes-list"></div>
+      </section>
+
+      <section class="panel history-panel">
+        <div class="panel-head">
+          <div>
+            <p class="label">Historial</p>
+            <h2>Ultimos turnos</h2>
+          </div>
+        </div>
+        <div class="history-list" id="history-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <template id="recipe-template">
+    <article class="recipe-card">
+      <div class="recipe-main">
+        <div class="recipe-topline">
+          <span class="priority-pill"></span>
+          <span class="meal-day"></span>
+        </div>
+        <h3 class="recipe-title"></h3>
+        <p class="recipe-description"></p>
+        <div class="tag-row ingredients-row"></div>
+        <div class="tag-row reason-row"></div>
+      </div>
+      <button class="select-button" type="button">Elegir</button>
+    </article>
+  </template>
+
+  <template id="history-template">
+    <article class="history-item">
+      <div>
+        <p class="history-title"></p>
+        <p class="history-meta"></p>
+      </div>
+      <span class="history-turn"></span>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
