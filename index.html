@@ -193,19 +193,67 @@
             <p class="label">Seccion 3</p>
             <h2>Compras y consumo</h2>
           </div>
-          <p class="note">Esta parte la dejamos preparada para seguirla despues.</p>
+          <p class="note">Stock estimado con barras y descuentos aproximados por receta.</p>
         </div>
 
-        <div class="future-card">
-          <p class="future-title">Proximo paso</p>
-          <p class="future-copy">
-            Aca despues podemos estimar compras segun las comidas elegidas, ver que ingredientes se repiten
-            mas y detectar que conviene reponer primero.
-          </p>
-          <p class="future-copy" id="shopping-preview">
-            Cuando empecemos esta seccion, ya va a tener disponible el historial del menu y la lista de ingredientes.
-          </p>
+        <div class="content-grid">
+          <section class="subpanel">
+            <div class="subpanel-head">
+              <p class="label">Resumen</p>
+            </div>
+            <div class="balance-grid shopping-summary-grid">
+              <article class="balance-card">
+                <p class="label">Ingredientes bajos</p>
+                <p class="value" id="low-stock-count">0</p>
+              </article>
+              <article class="balance-card">
+                <p class="label">Promedio de stock</p>
+                <p class="value" id="average-stock">0%</p>
+              </article>
+            </div>
+            <p class="balance-summary" id="shopping-preview">
+              El stock se descuenta automaticamente cuando seleccionan comidas y despues se puede corregir a mano.
+            </p>
+          </section>
+
+          <section class="subpanel">
+            <div class="subpanel-head">
+              <p class="label">Acciones rapidas</p>
+            </div>
+            <div class="actions">
+              <button class="secondary-button" id="refill-all-button" type="button">Llenar todo al 100%</button>
+            </div>
+            <p class="future-copy">
+              Si compran algo, pueden subir solo ese ingrediente. Si hacen una compra grande, tambien pueden dejar todo
+              de nuevo al 100%.
+            </p>
+          </section>
         </div>
+
+        <div class="inventory-list" id="inventory-list"></div>
+        <template id="inventory-template">
+          <article class="inventory-item">
+            <div class="inventory-head">
+              <div>
+                <p class="history-title inventory-name"></p>
+                <p class="history-meta inventory-base"></p>
+              </div>
+              <strong class="inventory-percent"></strong>
+            </div>
+            <div class="inventory-bar">
+              <div class="inventory-fill"></div>
+            </div>
+            <div class="inventory-foot">
+              <p class="future-copy inventory-usage"></p>
+              <div class="inventory-controls">
+                <button class="mini-button" type="button" data-action="-10">-10%</button>
+                <button class="mini-button" type="button" data-action="+10">+10%</button>
+                <button class="mini-button" type="button" data-action="+25">+25%</button>
+                <button class="mini-button" type="button" data-action="100">100%</button>
+              </div>
+            </div>
+          </article>
+        </template>
       </section>
     </main>
   </div>
