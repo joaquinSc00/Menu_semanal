@@ -33,6 +33,8 @@
           </div>
         </div>
 
+        <p class="sync-note" id="sync-status">Sincronizando menu compartido...</p>
+
         <div class="actions">
           <button class="secondary-button" id="undo-button" type="button">Deshacer ultima seleccion</button>
           <button class="secondary-button danger" id="reset-button" type="button">Reiniciar semana</button>
@@ -124,6 +126,20 @@
     </article>
   </template>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script>
+    window.menuSemanalFirebaseConfig = {
+      apiKey: "AIzaSyDQtlje0lT72YQh1436h9rtNkViI6QRb-o",
+      authDomain: "seguimiento-tps.firebaseapp.com",
+      projectId: "seguimiento-tps",
+      storageBucket: "seguimiento-tps.firebasestorage.app",
+      messagingSenderId: "659608661414",
+      appId: "1:659608661414:web:fb94ba59a0bea2fd4d3367",
+      measurementId: "G-D0S1ED5P2R",
+      databaseURL: "https://seguimiento-tps-default-rtdb.firebaseio.com"
+    };
+  </script>
   <script src="app.js"></script>
 </body>
 </html>
