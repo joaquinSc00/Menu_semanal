@@ -65,6 +65,51 @@
         <div class="recipes-list" id="recipes-list"></div>
       </section>
 
+      <section class="panel add-panel">
+        <div class="panel-head">
+          <div>
+            <p class="label">Agregar receta</p>
+            <h2>Sumar mas opciones</h2>
+          </div>
+          <p class="note">Los ingredientes sugeridos salen de todas las recetas ya cargadas.</p>
+        </div>
+
+        <form id="add-recipe-form" class="recipe-form">
+          <label class="field">
+            <span class="field-label">Titulo</span>
+            <input id="recipe-title-input" name="title" type="text" placeholder="Ej: Pollo al horno con papas" required>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Turno</span>
+            <select id="recipe-meal-input" name="meal">
+              <option value="almuerzo">Almuerzo</option>
+              <option value="cena">Cena</option>
+            </select>
+          </label>
+
+          <label class="field field-wide">
+            <span class="field-label">Descripcion</span>
+            <textarea id="recipe-description-input" name="description" rows="3" placeholder="Conta rapido como se arma la receta." required></textarea>
+          </label>
+
+          <label class="field field-wide">
+            <span class="field-label">Ingredientes</span>
+            <input id="recipe-ingredients-input" name="ingredients" type="text" placeholder="Escribilos separados por coma o toca sugerencias abajo." required>
+          </label>
+
+          <div class="field field-wide">
+            <span class="field-label">Ingredientes sugeridos</span>
+            <div class="ingredient-suggestions" id="ingredient-suggestions"></div>
+          </div>
+
+          <div class="form-actions">
+            <button class="secondary-button" type="submit">Guardar receta</button>
+            <p class="form-feedback" id="add-recipe-feedback" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+
       <section class="panel history-panel">
         <div class="panel-head">
           <div>
