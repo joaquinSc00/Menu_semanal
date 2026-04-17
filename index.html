@@ -15,34 +15,20 @@
       <p class="eyebrow">Rotacion inteligente de comidas</p>
       <h1>Que comemos hoy</h1>
       <p class="hero-copy">
-        La pagina prioriza recetas que no repitan lo ultimo que comieron y manda al fondo
-        lo que use pechuga, lentejas o ingredientes muy recientes.
+        Todas las comidas quedan en una sola lista. Cuando elegis una, desaparece por las
+        4 selecciones siguientes para obligar a rotar y ver otras opciones.
       </p>
     </header>
 
     <main class="layout">
       <section class="panel status-panel">
-        <div class="status-grid">
-          <div>
-            <p class="label">Dia actual</p>
-            <p class="value" id="current-day">-</p>
-          </div>
-          <div>
-            <p class="label">Turno</p>
-            <div class="turn-switch" role="group" aria-label="Cambiar turno">
-              <button class="turn-button" id="lunch-button" type="button">Almuerzo</button>
-              <button class="turn-button" id="dinner-button" type="button">Cena</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="status-grid secondary">
+        <div class="status-grid secondary no-top-border">
           <div>
             <p class="label">Ultima comida</p>
             <p class="value small" id="last-meal">Todavia no hay historial.</p>
           </div>
           <div>
-            <p class="label">Criterio actual</p>
+            <p class="label">Rotacion actual</p>
             <p class="value small" id="priority-summary">Se muestran primero las opciones menos repetidas.</p>
           </div>
         </div>
@@ -57,9 +43,9 @@
         <div class="panel-head">
           <div>
             <p class="label">Opciones sugeridas</p>
-            <h2 id="recipes-title">Almuerzo</h2>
+            <h2 id="recipes-title">Todas las comidas</h2>
           </div>
-          <p class="note">La receta exacta recien usada se bloquea por algunos turnos.</p>
+          <p class="note">Las ultimas 4 comidas elegidas se ocultan temporalmente.</p>
         </div>
 
         <div class="recipes-list" id="recipes-list"></div>
@@ -75,32 +61,23 @@
         </div>
 
         <form id="add-recipe-form" class="recipe-form">
-          <label class="field">
+          <label class="field field-wide">
             <span class="field-label">Titulo</span>
             <input id="recipe-title-input" name="title" type="text" placeholder="Ej: Pollo al horno con papas" required>
           </label>
 
-          <label class="field">
-            <span class="field-label">Turno</span>
-            <select id="recipe-meal-input" name="meal">
-              <option value="almuerzo">Almuerzo</option>
-              <option value="cena">Cena</option>
-            </select>
-          </label>
-
-          <label class="field field-wide">
-            <span class="field-label">Descripcion</span>
-            <textarea id="recipe-description-input" name="description" rows="3" placeholder="Conta rapido como se arma la receta." required></textarea>
-          </label>
-
-          <label class="field field-wide">
-            <span class="field-label">Ingredientes</span>
-            <input id="recipe-ingredients-input" name="ingredients" type="text" placeholder="Escribilos separados por coma o toca sugerencias abajo." required>
-          </label>
+          <div class="field field-wide">
+            <span class="field-label">Ingrediente</span>
+            <div class="ingredient-picker">
+              <select id="ingredient-select" name="ingredient"></select>
+              <button class="secondary-button" id="add-ingredient-button" type="button">Agregar ingrediente</button>
+              <button class="secondary-button" id="clear-ingredients-button" type="button">Limpiar</button>
+            </div>
+          </div>
 
           <div class="field field-wide">
-            <span class="field-label">Ingredientes sugeridos</span>
-            <div class="ingredient-suggestions" id="ingredient-suggestions"></div>
+            <span class="field-label">Ingredientes elegidos</span>
+            <div class="ingredient-suggestions" id="selected-ingredients"></div>
           </div>
 
           <div class="form-actions">
@@ -114,7 +91,7 @@
         <div class="panel-head">
           <div>
             <p class="label">Historial</p>
-            <h2>Ultimos turnos</h2>
+            <h2>Ultimas comidas</h2>
           </div>
         </div>
         <div class="history-list" id="history-list"></div>
@@ -130,7 +107,6 @@
           <span class="meal-day"></span>
         </div>
         <h3 class="recipe-title"></h3>
-        <p class="recipe-description"></p>
         <div class="tag-row ingredients-row"></div>
         <div class="tag-row reason-row"></div>
       </div>
