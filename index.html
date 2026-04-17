@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu Semanal</title>
+  <title>Casa Santi y Joaquin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,16 +12,44 @@
 <body>
   <div class="page-shell">
     <header class="hero">
-      <p class="eyebrow">Rotacion inteligente de comidas</p>
-      <h1>Que comemos hoy</h1>
+      <p class="eyebrow">Organizacion compartida</p>
+      <h1>Casa Santi y Joaquin</h1>
       <p class="hero-copy">
-        Todas las comidas quedan en una sola lista. Cuando elegis una, desaparece por las
-        4 selecciones siguientes para obligar a rotar y ver otras opciones.
+        Una sola pagina para decidir comidas, registrar gastos del departamento y mas adelante
+        estimar compras segun lo que se va consumiendo.
       </p>
+
+      <div class="hero-grid">
+        <div class="hero-card">
+          <p class="label">Navegacion rapida</p>
+          <div class="quick-links">
+            <a class="quick-link" href="#menu-section">Que comemos hoy</a>
+            <a class="quick-link" href="#expenses-section">Gastos del depto</a>
+            <a class="quick-link" href="#shopping-section">Compras y consumo</a>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <p class="label">Quien sos</p>
+          <div class="identity-switch" role="group" aria-label="Seleccionar identidad">
+            <button class="identity-button" id="identity-santi" type="button">SANTI</button>
+            <button class="identity-button" id="identity-joaquin" type="button">JOAQUIN</button>
+          </div>
+          <p class="identity-note" id="current-user-label">Todavia no elegiste usuario en este dispositivo.</p>
+        </div>
+      </div>
     </header>
 
-    <main class="layout">
-      <section class="panel status-panel">
+    <main class="section-stack">
+      <section class="panel" id="menu-section">
+        <div class="panel-head">
+          <div>
+            <p class="label">Seccion 1</p>
+            <h2>Que comemos hoy</h2>
+          </div>
+          <p class="note">Las ultimas 4 comidas elegidas desaparecen temporalmente.</p>
+        </div>
+
         <div class="status-grid secondary no-top-border">
           <div>
             <p class="label">Ultima comida</p>
@@ -33,70 +61,138 @@
           </div>
         </div>
 
-        <p class="sync-note" id="sync-status">Sincronizando menu compartido...</p>
+        <p class="sync-note" id="sync-status">Sincronizando datos compartidos...</p>
 
         <div class="actions">
           <button class="secondary-button" id="undo-button" type="button">Deshacer ultima seleccion</button>
-          <button class="secondary-button danger" id="reset-button" type="button">Reiniciar semana</button>
-        </div>
-      </section>
-
-      <section class="panel recipes-panel">
-        <div class="panel-head">
-          <div>
-            <p class="label">Opciones sugeridas</p>
-            <h2 id="recipes-title">Todas las comidas</h2>
-          </div>
-          <p class="note">Las ultimas 4 comidas elegidas se ocultan temporalmente.</p>
+          <button class="secondary-button danger" id="reset-button" type="button">Reiniciar menu</button>
         </div>
 
-        <div class="recipes-list" id="recipes-list"></div>
-      </section>
-
-      <section class="panel add-panel">
-        <div class="panel-head">
-          <div>
-            <p class="label">Agregar receta</p>
-            <h2>Sumar mas opciones</h2>
-          </div>
-          <p class="note">Los ingredientes sugeridos salen de todas las recetas ya cargadas.</p>
-        </div>
-
-        <form id="add-recipe-form" class="recipe-form">
-          <label class="field field-wide">
-            <span class="field-label">Titulo</span>
-            <input id="recipe-title-input" name="title" type="text" placeholder="Ej: Pollo al horno con papas" required>
-          </label>
-
-          <div class="field field-wide">
-            <span class="field-label">Ingrediente</span>
-            <div class="ingredient-picker">
-              <select id="ingredient-select" name="ingredient"></select>
-              <button class="secondary-button" id="add-ingredient-button" type="button">Agregar ingrediente</button>
-              <button class="secondary-button" id="clear-ingredients-button" type="button">Limpiar</button>
+        <div class="content-grid">
+          <section class="subpanel">
+            <div class="subpanel-head">
+              <p class="label">Opciones sugeridas</p>
             </div>
-          </div>
+            <div class="recipes-list" id="recipes-list"></div>
+          </section>
 
-          <div class="field field-wide">
-            <span class="field-label">Ingredientes elegidos</span>
-            <div class="ingredient-suggestions" id="selected-ingredients"></div>
-          </div>
+          <section class="subpanel">
+            <div class="subpanel-head">
+              <p class="label">Agregar comida</p>
+            </div>
 
-          <div class="form-actions">
-            <button class="secondary-button" type="submit">Guardar receta</button>
-            <p class="form-feedback" id="add-recipe-feedback" aria-live="polite"></p>
-          </div>
-        </form>
+            <form id="add-recipe-form" class="recipe-form">
+              <label class="field field-wide">
+                <span class="field-label">Titulo</span>
+                <input id="recipe-title-input" name="title" type="text" placeholder="Ej: Pollo al horno con papas" required>
+              </label>
+
+              <div class="field field-wide">
+                <span class="field-label">Ingrediente</span>
+                <div class="ingredient-picker">
+                  <select id="ingredient-select" name="ingredient"></select>
+                  <button class="secondary-button" id="add-ingredient-button" type="button">Agregar ingrediente</button>
+                  <button class="secondary-button" id="clear-ingredients-button" type="button">Limpiar</button>
+                </div>
+              </div>
+
+              <div class="field field-wide">
+                <span class="field-label">Ingredientes elegidos</span>
+                <div class="ingredient-suggestions" id="selected-ingredients"></div>
+              </div>
+
+              <div class="form-actions">
+                <button class="secondary-button" type="submit">Guardar comida</button>
+                <p class="form-feedback" id="add-recipe-feedback" aria-live="polite"></p>
+              </div>
+            </form>
+
+            <div class="subpanel-head history-head">
+              <p class="label">Historial</p>
+            </div>
+            <div class="history-list" id="history-list"></div>
+          </section>
+        </div>
       </section>
 
-      <section class="panel history-panel">
+      <section class="panel" id="expenses-section">
         <div class="panel-head">
           <div>
-            <p class="label">Historial</p>
-            <h2>Ultimas comidas</h2>
+            <p class="label">Seccion 2</p>
+            <h2>Gastos comunes del departamento</h2>
           </div>
+          <p class="note">Se guarda quien pago segun el usuario elegido en este dispositivo.</p>
         </div>
-        <div class="history-list" id="history-list"></div>
+
+        <div class="content-grid">
+          <section class="subpanel">
+            <div class="subpanel-head">
+              <p class="label">Cargar gasto</p>
+            </div>
+
+            <form id="add-expense-form" class="recipe-form">
+              <label class="field">
+                <span class="field-label">Monto</span>
+                <input id="expense-amount-input" name="amount" type="number" min="0" step="0.01" placeholder="Ej: 12500" required>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Descripcion</span>
+                <input id="expense-description-input" name="description" type="text" placeholder="Ej: Super, expensas, limpieza" required>
+              </label>
+
+              <div class="form-actions">
+                <button class="secondary-button" type="submit">Guardar gasto</button>
+                <p class="form-feedback" id="add-expense-feedback" aria-live="polite"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="subpanel">
+            <div class="subpanel-head">
+              <p class="label">Balance</p>
+            </div>
+
+            <div class="balance-grid">
+              <article class="balance-card">
+                <p class="label">Aportado por Santi</p>
+                <p class="value" id="spent-santi">$0</p>
+              </article>
+              <article class="balance-card">
+                <p class="label">Aportado por Joaquin</p>
+                <p class="value" id="spent-joaquin">$0</p>
+              </article>
+            </div>
+
+            <p class="balance-summary" id="expense-balance-summary">Todavia no hay gastos cargados.</p>
+
+            <div class="subpanel-head history-head">
+              <p class="label">Ultimos gastos</p>
+            </div>
+            <div class="expenses-list" id="expenses-list"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="panel" id="shopping-section">
+        <div class="panel-head">
+          <div>
+            <p class="label">Seccion 3</p>
+            <h2>Compras y consumo</h2>
+          </div>
+          <p class="note">Esta parte la dejamos preparada para seguirla despues.</p>
+        </div>
+
+        <div class="future-card">
+          <p class="future-title">Proximo paso</p>
+          <p class="future-copy">
+            Aca despues podemos estimar compras segun las comidas elegidas, ver que ingredientes se repiten
+            mas y detectar que conviene reponer primero.
+          </p>
+          <p class="future-copy" id="shopping-preview">
+            Cuando empecemos esta seccion, ya va a tener disponible el historial del menu y la lista de ingredientes.
+          </p>
+        </div>
       </section>
     </main>
   </div>
@@ -123,6 +219,19 @@
         <p class="history-meta"></p>
       </div>
       <span class="history-turn"></span>
+    </article>
+  </template>
+
+  <template id="expense-template">
+    <article class="expense-item">
+      <div>
+        <p class="history-title expense-description"></p>
+        <p class="history-meta expense-meta"></p>
+      </div>
+      <div class="expense-side">
+        <span class="history-turn expense-user"></span>
+        <strong class="expense-amount"></strong>
+      </div>
     </article>
   </template>
 
