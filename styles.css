@@ -148,6 +148,7 @@ select {
 .future-card {
   border-color: var(--line);
   background: var(--panel-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .section-menu {
@@ -258,19 +259,23 @@ select {
 
 .quick-link {
   display: grid;
-  gap: 6px;
-  min-height: 136px;
-  align-content: start;
-  border-radius: 24px;
-  padding: 18px;
+  gap: 8px;
+  min-height: 104px;
+  align-content: center;
+  border-radius: 22px;
+  padding: 18px 20px;
   text-align: left;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   color: #fff8f0;
   border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 14px 26px rgba(28, 17, 10, 0.16);
 }
 
 .quick-link strong {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
+  line-height: 1.2;
 }
 
 .quick-link-kicker {
@@ -281,22 +286,28 @@ select {
   opacity: 0.76;
 }
 
-.quick-link-copy {
-  color: rgba(255, 248, 240, 0.76);
-  line-height: 1.45;
-  font-weight: 700;
-}
-
 .quick-link-menu {
-  background: linear-gradient(160deg, rgba(255, 193, 131, 0.2), rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(160deg, rgba(255, 193, 131, 0.34), rgba(255, 255, 255, 0.08)),
+    rgba(255, 255, 255, 0.08);
 }
 
 .quick-link-expenses {
-  background: linear-gradient(160deg, rgba(142, 201, 158, 0.24), rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(160deg, rgba(142, 201, 158, 0.34), rgba(255, 255, 255, 0.08)),
+    rgba(255, 255, 255, 0.08);
 }
 
 .quick-link-shopping {
-  background: linear-gradient(160deg, rgba(221, 206, 164, 0.24), rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(160deg, rgba(221, 206, 164, 0.34), rgba(255, 255, 255, 0.08)),
+    rgba(255, 255, 255, 0.08);
+}
+
+.quick-link:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 18px 30px rgba(28, 17, 10, 0.2);
 }
 
 .identity-button.active {
@@ -322,10 +333,21 @@ select {
 
 .panel-head {
   margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(101, 77, 46, 0.1);
 }
 
 .subpanel-head.history-head {
   margin-top: 20px;
+}
+
+.history-box {
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px dashed rgba(101, 77, 46, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.38);
+  min-height: 96px;
 }
 
 .note,
@@ -471,6 +493,11 @@ select {
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
   background: var(--panel-strong);
+}
+
+.history-item,
+.expense-item {
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .recipe-main {
