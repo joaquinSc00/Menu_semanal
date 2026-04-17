@@ -573,6 +573,48 @@ select {
   margin-bottom: 12px;
 }
 
+.clickable-card {
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.clickable-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(42, 35, 29, 0.12);
+}
+
+.low-stock-panel {
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid rgba(101, 77, 46, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.low-stock-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.low-stock-items {
+  display: grid;
+  gap: 8px;
+}
+
+.low-stock-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(167, 55, 48, 0.08);
+  color: var(--text);
+  font-weight: 800;
+}
+
 .inventory-item {
   padding: 18px;
   border-radius: var(--radius-md);
@@ -609,11 +651,11 @@ select {
   background: linear-gradient(90deg, #6ea46d, #3d6e43);
 }
 
-.inventory-item[data-level=\"medium\"] .inventory-fill {
+.inventory-item[data-level="medium"] .inventory-fill {
   background: linear-gradient(90deg, #d8ae45, #b17b20);
 }
 
-.inventory-item[data-level=\"low\"] .inventory-fill {
+.inventory-item[data-level="low"] .inventory-fill {
   background: linear-gradient(90deg, #d46857, #a73730);
 }
 
