@@ -1,8 +1,60 @@
-const STORAGE_KEY = "menu-semanal-rotation-v4";
+﻿const STORAGE_KEY = "menu-semanal-rotation-v5";
 const CURRENT_USER_KEY = "menu-semanal-current-user";
 const MENU_REF_PATH = "menuSemanal/sharedState";
 const BLOCK_TURNS = 4;
 const USERS = ["SANTI", "JOAQUIN"];
+
+const ingredientCatalog = [
+  { key: "costeletas", label: "Costeletas", baseLabel: "100% = 4 kg aprox", defaultPercent: 5, usageLabel: "Uso normal: 2 costeletas = 5%" },
+  { key: "papas", label: "Papas", baseLabel: "100% = 2 kg aprox / 8 medianas", defaultPercent: 25, usageLabel: "Uso normal: 2 papas = 25%" },
+  { key: "cebolla", label: "Cebolla", baseLabel: "100% = 2 kg aprox / 14 cebollas", defaultPercent: 7, usageLabel: "Uso normal: 1 cebolla = 7%" },
+  { key: "huevo", label: "Huevos", baseLabel: "100% = 60 huevos", defaultPercent: 5, usageLabel: "Uso normal: 3 huevos = 5%" },
+  { key: "tomate", label: "Tomate", baseLabel: "100% = 1 kg aprox / 7 tomates", defaultPercent: 14, usageLabel: "Uso normal: 1 tomate = 14%" },
+  { key: "lechuga", label: "Lechuga", baseLabel: "100% = 1 unidad", defaultPercent: 50, usageLabel: "Uso normal: media lechuga = 50%" },
+  { key: "pechuga", label: "Pechuga", baseLabel: "100% = 3 kg", defaultPercent: 13, usageLabel: "Uso normal: 400 g total = 13%" },
+  { key: "queso", label: "Queso", baseLabel: "100% = 2 kg", defaultPercent: 10, usageLabel: "Uso normal: 200 g = 10%" },
+  { key: "arroz", label: "Arroz", baseLabel: "100% = 4 kg", defaultPercent: 5, usageLabel: "Uso normal: 200 g = 5%" },
+  { key: "lentejas", label: "Lentejas", baseLabel: "100% = 4 latas", defaultPercent: 25, usageLabel: "Uso normal: 1 lata = 25%" },
+  { key: "arvejas", label: "Arvejas", baseLabel: "100% = 4 latas", defaultPercent: 25, usageLabel: "Uso normal: 1 lata = 25%" },
+  { key: "jardinera", label: "Jardinera", baseLabel: "100% = 4 latas", defaultPercent: 25, usageLabel: "Uso normal: 1 lata = 25%" },
+  { key: "choclo", label: "Choclo", baseLabel: "100% = 2 latas", defaultPercent: 25, usageLabel: "Uso normal: media lata = 25%" },
+  { key: "picadillo", label: "Picadillo", baseLabel: "100% = 4 latas", defaultPercent: 25, usageLabel: "Uso normal: 1 lata = 25%" },
+  { key: "carne ternera", label: "Carne ternera", baseLabel: "100% = 2 kg", defaultPercent: 15, usageLabel: "Uso normal: 300 g total = 15%" }
+];
+
+const ingredientAliasMap = {
+  "huevo duro": "huevo",
+  "huevo frito": "huevo",
+  huevo: "huevo",
+  pollo: "pechuga",
+  carne: "carne ternera"
+};
+
+const recipeConsumptionById = {
+  "pechuga-lentejas-huevo-cebolla": { pechuga: 13, lentejas: 25, huevo: 4, cebolla: 4 },
+  "arroz-pollo-caldo-queso-cebolla": { arroz: 5, pechuga: 13, queso: 10, cebolla: 4 },
+  "tomate-relleno-picadillo-huevo-ajo-cebolla": { tomate: 14, picadillo: 25, huevo: 4, cebolla: 4 },
+  "costeletas-ensalada-cebolla": { costeletas: 5, tomate: 14, lechuga: 50, cebolla: 11 },
+  "tortilla-arvejas-costeleta": { arvejas: 25, huevo: 5, queso: 10, tomate: 14, costeletas: 5 },
+  "arroz-huevo-frito-queso-caldo": { arroz: 5, huevo: 4, queso: 10 },
+  "zapallito-revuelto-cebolla": { queso: 8, huevo: 4, cebolla: 11 },
+  "jardinera-fria-huevos-carne": { jardinera: 25, huevo: 7, pechuga: 7 },
+  "pechuga-rebozada-arroz": { pechuga: 13, arroz: 5 },
+  "ensalada-lentejas-carne": { lentejas: 25, tomate: 14, cebolla: 7, huevo: 7, "carne ternera": 15 },
+  "tomate-relleno-ajo": { tomate: 14, picadillo: 25, huevo: 4 },
+  "omelette-fiambre-queso": { huevo: 4, queso: 8, tomate: 14, lechuga: 50 },
+  "bife-papas-huevo-frito": { costeletas: 5, papas: 25, huevo: 4 },
+  "arroz-tiritas-costeleta": { arroz: 5, queso: 8, costeletas: 5 },
+  "tortilla-arvejas-pechuga": { arvejas: 25, huevo: 5, queso: 8, pechuga: 13 },
+  "zapallito-revuelto-clasico": { queso: 8, huevo: 4, cebolla: 11 },
+  "jardinera-pechuga": { jardinera: 25, huevo: 4, pechuga: 13 },
+  "arroz-choclo-costeleta": { arroz: 5, choclo: 25, queso: 8, costeletas: 5 },
+  "costeletas-ensalada-fresca": { costeletas: 5, tomate: 14, lechuga: 50, cebolla: 7 },
+  "tortilla-arvejas-salsa-carne": { arvejas: 25, huevo: 5, "carne ternera": 15, tomate: 8 },
+  "papas-cebollas-air-fryer": { papas: 25, cebolla: 11, huevo: 4 },
+  "ensalada-lentejas-huevo-duro": { lentejas: 25, tomate: 14, cebolla: 7, huevo: 4 },
+  "omelette-fiambre-queso-ensalada": { huevo: 4, queso: 8, tomate: 14, lechuga: 50 }
+};
 
 const builtInRecipes = [
   { id: "pechuga-lentejas-huevo-cebolla", title: "Pechuga con lentejas, huevo y cebolla", ingredients: ["pechuga", "lentejas", "huevo", "cebolla"] },
@@ -29,7 +81,6 @@ const builtInRecipes = [
   { id: "ensalada-lentejas-huevo-duro", title: "Ensalada de lentejas con huevo duro", ingredients: ["lentejas", "tomate", "cebolla", "huevo duro"] },
   { id: "omelette-fiambre-queso-ensalada", title: "Omelette de fiambre y queso con ensalada", ingredients: ["omelette", "fiambre", "queso", "tomate", "lechuga"] }
 ];
-
 const builtInExpenses = [
   { id: "expense-2026-02-05-muslo-papas", amount: 6000, description: "Muslo y papas", paidBy: "JOAQUIN", createdAt: "2026-02-05T12:00:00-03:00" },
   { id: "expense-2026-02-10-queso-salsa", amount: 5000, description: "Queso y salsa", paidBy: "SANTI", createdAt: "2026-02-10T12:00:00-03:00" },
@@ -55,15 +106,15 @@ const builtInExpenses = [
   { id: "expense-2026-04-14-huevos", amount: 6700, description: "Huevos", paidBy: "SANTI", createdAt: "2026-04-14T12:00:00-03:00" }
 ];
 
-const baseIngredientPool = Array.from(
-  new Set(builtInRecipes.flatMap((recipe) => recipe.ingredients).map(normalizeIngredient).filter(Boolean))
-).sort((left, right) => left.localeCompare(right));
+const inventoryDefaults = Object.fromEntries(ingredientCatalog.map((item) => [item.key, 100]));
+const baseIngredientPool = Array.from(new Set(builtInRecipes.flatMap((recipe) => recipe.ingredients).map(normalizeIngredient).filter(Boolean))).sort((left, right) => left.localeCompare(right));
 
 const defaultState = {
   history: [],
   customRecipes: [],
   pantryIngredients: baseIngredientPool,
-  expenses: builtInExpenses
+  expenses: builtInExpenses,
+  inventory: inventoryDefaults
 };
 
 const identitySantiButton = document.getElementById("identity-santi");
@@ -92,6 +143,10 @@ const spentJoaquinElement = document.getElementById("spent-joaquin");
 const expenseBalanceSummaryElement = document.getElementById("expense-balance-summary");
 const expensesListElement = document.getElementById("expenses-list");
 const shoppingPreviewElement = document.getElementById("shopping-preview");
+const lowStockCountElement = document.getElementById("low-stock-count");
+const averageStockElement = document.getElementById("average-stock");
+const inventoryListElement = document.getElementById("inventory-list");
+const refillAllButton = document.getElementById("refill-all-button");
 
 let state = loadCachedState();
 let currentUser = loadCurrentUser();
@@ -103,12 +158,13 @@ function normalizeIngredient(value) {
   return value.trim().toLowerCase();
 }
 
+function normalizeTrackedIngredient(value) {
+  const normalized = normalizeIngredient(value);
+  return ingredientAliasMap[normalized] || normalized;
+}
+
 function formatCurrency(value) {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 2
-  }).format(value || 0);
+  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 2 }).format(value || 0);
 }
 
 function formatDate(value) {
@@ -117,11 +173,11 @@ function formatDate(value) {
 }
 
 function prettifyIngredient(value) {
-  return value
-    .split(" ")
-    .filter(Boolean)
-    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
-    .join(" ");
+  return value.split(" ").filter(Boolean).map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1)).join(" ");
+}
+
+function clampPercent(value) {
+  return Math.max(0, Math.min(100, Math.round(value)));
 }
 
 function setSyncStatus(message, tone = "default") {
@@ -143,7 +199,6 @@ function setCurrentUser(user) {
   window.localStorage.setItem(CURRENT_USER_KEY, user);
   renderIdentity();
 }
-
 function buildRecipes() {
   return [...builtInRecipes, ...state.customRecipes];
 }
@@ -154,10 +209,7 @@ function sanitizeRecipe(recipe) {
   }
 
   const title = typeof recipe.title === "string" ? recipe.title.trim() : "";
-  const ingredients = Array.isArray(recipe.ingredients)
-    ? Array.from(new Set(recipe.ingredients.map(normalizeIngredient).filter(Boolean)))
-    : [];
-
+  const ingredients = Array.isArray(recipe.ingredients) ? Array.from(new Set(recipe.ingredients.map(normalizeIngredient).filter(Boolean))) : [];
   if (!title || ingredients.length === 0) {
     return null;
   }
@@ -177,7 +229,6 @@ function sanitizeExpense(expense) {
   const amount = Number(expense.amount);
   const description = typeof expense.description === "string" ? expense.description.trim() : "";
   const paidBy = typeof expense.paidBy === "string" ? expense.paidBy.trim().toUpperCase() : "";
-
   if (!description || !Number.isFinite(amount) || amount <= 0 || !USERS.includes(paidBy)) {
     return null;
   }
@@ -192,55 +243,39 @@ function sanitizeExpense(expense) {
 }
 
 function mergeIngredientPools(...ingredientLists) {
-  return Array.from(
-    new Set(
-      ingredientLists
-        .flat()
-        .map((ingredient) => normalizeIngredient(String(ingredient)))
-        .filter(Boolean)
-    )
-  ).sort((left, right) => left.localeCompare(right));
-}
-
-function sanitizeState(rawState) {
-  const customRecipes = Array.isArray(rawState?.customRecipes)
-    ? rawState.customRecipes.map(sanitizeRecipe).filter(Boolean)
-    : [];
-  const expenses = mergeExpenses(
-    builtInExpenses,
-    Array.isArray(rawState?.expenses) ? rawState.expenses.map(sanitizeExpense).filter(Boolean) : []
-  );
-
-  return {
-    history: Array.isArray(rawState?.history)
-      ? rawState.history
-          .filter((entry) => entry && typeof entry.recipeId === "string")
-          .map((entry) => ({
-            recipeId: entry.recipeId,
-            selectedAt: typeof entry.selectedAt === "string" ? entry.selectedAt : new Date().toISOString()
-          }))
-      : [],
-    customRecipes,
-    pantryIngredients: mergeIngredientPools(
-      baseIngredientPool,
-      Array.isArray(rawState?.pantryIngredients) ? rawState.pantryIngredients : [],
-      customRecipes.flatMap((recipe) => recipe.ingredients)
-    ),
-    expenses
-  };
+  return Array.from(new Set(ingredientLists.flat().map((ingredient) => normalizeIngredient(String(ingredient))).filter(Boolean))).sort((left, right) => left.localeCompare(right));
 }
 
 function mergeExpenses(...expenseLists) {
   const expenseMap = new Map();
-
-  expenseLists
-    .flat()
-    .filter(Boolean)
-    .forEach((expense) => {
-      expenseMap.set(expense.id, expense);
-    });
-
+  expenseLists.flat().filter(Boolean).forEach((expense) => expenseMap.set(expense.id, expense));
   return [...expenseMap.values()].sort((left, right) => left.createdAt.localeCompare(right.createdAt));
+}
+
+function sanitizeInventory(rawInventory) {
+  const inventory = {};
+  ingredientCatalog.forEach((ingredient) => {
+    inventory[ingredient.key] = clampPercent(Number(rawInventory?.[ingredient.key] ?? 100));
+  });
+  return inventory;
+}
+
+function sanitizeState(rawState) {
+  const customRecipes = Array.isArray(rawState?.customRecipes) ? rawState.customRecipes.map(sanitizeRecipe).filter(Boolean) : [];
+  const expenses = mergeExpenses(builtInExpenses, Array.isArray(rawState?.expenses) ? rawState.expenses.map(sanitizeExpense).filter(Boolean) : []);
+
+  return {
+    history: Array.isArray(rawState?.history)
+      ? rawState.history.filter((entry) => entry && typeof entry.recipeId === "string").map((entry) => ({
+          recipeId: entry.recipeId,
+          selectedAt: typeof entry.selectedAt === "string" ? entry.selectedAt : new Date().toISOString()
+        }))
+      : [],
+    customRecipes,
+    pantryIngredients: mergeIngredientPools(baseIngredientPool, Array.isArray(rawState?.pantryIngredients) ? rawState.pantryIngredients : [], customRecipes.flatMap((recipe) => recipe.ingredients)),
+    expenses,
+    inventory: sanitizeInventory(rawState?.inventory)
+  };
 }
 
 function loadCachedState() {
@@ -293,16 +328,43 @@ function getBlockedIds() {
   return state.history.slice(-BLOCK_TURNS).map((entry) => entry.recipeId);
 }
 
+function getRecipeConsumption(recipe) {
+  if (recipeConsumptionById[recipe.id]) {
+    return recipeConsumptionById[recipe.id];
+  }
+
+  return recipe.ingredients.reduce((accumulator, ingredient) => {
+    const key = normalizeTrackedIngredient(ingredient);
+    const catalogEntry = ingredientCatalog.find((item) => item.key === key);
+    if (catalogEntry) {
+      accumulator[key] = Math.max(accumulator[key] || 0, catalogEntry.defaultPercent);
+    }
+    return accumulator;
+  }, {});
+}
+
+function applyRecipeConsumption(recipe) {
+  const consumption = getRecipeConsumption(recipe);
+  Object.entries(consumption).forEach(([ingredientKey, percent]) => {
+    state.inventory[ingredientKey] = clampPercent((state.inventory[ingredientKey] ?? 100) - percent);
+  });
+}
+
+function revertRecipeConsumption(recipe) {
+  const consumption = getRecipeConsumption(recipe);
+  Object.entries(consumption).forEach(([ingredientKey, percent]) => {
+    state.inventory[ingredientKey] = clampPercent((state.inventory[ingredientKey] ?? 100) + percent);
+  });
+}
+
 function selectRecipe(recipeId) {
-  if (!getRecipeById(recipeId)) {
+  const recipe = getRecipeById(recipeId);
+  if (!recipe) {
     return;
   }
 
-  state.history.push({
-    recipeId,
-    selectedAt: new Date().toISOString()
-  });
-
+  state.history.push({ recipeId, selectedAt: new Date().toISOString() });
+  applyRecipeConsumption(recipe);
   render();
   void persistState();
 }
@@ -312,7 +374,11 @@ function undoLastSelection() {
     return;
   }
 
-  state.history.pop();
+  const lastEntry = state.history.pop();
+  const recipe = getRecipeById(lastEntry.recipeId);
+  if (recipe) {
+    revertRecipeConsumption(recipe);
+  }
   render();
   void persistState();
 }
@@ -322,24 +388,26 @@ function resetState() {
   state.customRecipes = [];
   state.pantryIngredients = [...baseIngredientPool];
   state.expenses = [...builtInExpenses];
+  state.inventory = { ...inventoryDefaults };
   recipeDraftIngredients = [];
   render();
   void persistState();
 }
 
 function scoreRecipe(recipe) {
-  const recentIngredients = new Set(getHistoryIngredients(0));
-  const olderIngredients = new Set(getHistoryIngredients(1));
+  const recentIngredients = new Set(getHistoryIngredients(0).map(normalizeTrackedIngredient));
+  const olderIngredients = new Set(getHistoryIngredients(1).map(normalizeTrackedIngredient));
   const reasons = [];
   let score = 0;
+  const trackedIngredients = recipe.ingredients.map(normalizeTrackedIngredient);
 
-  const recentOverlap = recipe.ingredients.filter((ingredient) => recentIngredients.has(ingredient));
+  const recentOverlap = trackedIngredients.filter((ingredient) => recentIngredients.has(ingredient));
   if (recentOverlap.length > 0) {
     score += 180 + recentOverlap.length * 18;
     reasons.push(`Comparte con la ultima: ${recentOverlap.join(", ")}`);
   }
 
-  const olderOverlap = recipe.ingredients.filter((ingredient) => olderIngredients.has(ingredient));
+  const olderOverlap = trackedIngredients.filter((ingredient) => olderIngredients.has(ingredient));
   if (olderOverlap.length > 0) {
     score += 60 + olderOverlap.length * 10;
     reasons.push(`Tambien se parece a otra reciente: ${olderOverlap.join(", ")}`);
@@ -351,7 +419,6 @@ function scoreRecipe(recipe) {
 
   let priority = "Alta";
   let priorityClass = "priority-high";
-
   if (score >= 180) {
     priority = "Baja";
     priorityClass = "priority-low";
@@ -365,18 +432,12 @@ function scoreRecipe(recipe) {
 
 function getVisibleRecipes() {
   const blockedIds = new Set(getBlockedIds());
-  return buildRecipes()
-    .filter((recipe) => !blockedIds.has(recipe.id))
-    .map((recipe) => ({ recipe, ...scoreRecipe(recipe) }))
-    .sort((left, right) => left.score - right.score || left.recipe.title.localeCompare(right.recipe.title));
+  return buildRecipes().filter((recipe) => !blockedIds.has(recipe.id)).map((recipe) => ({ recipe, ...scoreRecipe(recipe) })).sort((left, right) => left.score - right.score || left.recipe.title.localeCompare(right.recipe.title));
 }
-
 function renderIdentity() {
   identitySantiButton.classList.toggle("active", currentUser === "SANTI");
   identityJoaquinButton.classList.toggle("active", currentUser === "JOAQUIN");
-  currentUserLabelElement.textContent = currentUser
-    ? `Este dispositivo esta usando la identidad ${currentUser}.`
-    : "Todavia no elegiste usuario en este dispositivo.";
+  currentUserLabelElement.textContent = currentUser ? `Este dispositivo esta usando la identidad ${currentUser}.` : "Todavia no elegiste usuario en este dispositivo.";
 }
 
 function renderRecipes() {
@@ -454,13 +515,8 @@ function renderMenuSummary() {
   const visibleRecipes = getVisibleRecipes();
   const hiddenCount = Math.min(getBlockedIds().length, buildRecipes().length);
 
-  lastMealElement.textContent = lastRecipe
-    ? `${lastRecipe.title} (${formatDate(lastEntry.selectedAt)})`
-    : "Todavia no hay historial.";
-
-  prioritySummaryElement.textContent = visibleRecipes[0]
-    ? `Hay ${visibleRecipes.length} comidas visibles y ${hiddenCount} ocultas por rotacion.`
-    : "Todas las comidas quedaron ocultas temporalmente por las ultimas selecciones.";
+  lastMealElement.textContent = lastRecipe ? `${lastRecipe.title} (${formatDate(lastEntry.selectedAt)})` : "Todavia no hay historial.";
+  prioritySummaryElement.textContent = visibleRecipes[0] ? `Hay ${visibleRecipes.length} comidas visibles y ${hiddenCount} ocultas por rotacion.` : "Todas las comidas quedaron ocultas temporalmente por las ultimas selecciones.";
 }
 
 function renderIngredientSelect() {
@@ -475,7 +531,6 @@ function renderIngredientSelect() {
 
 function renderSelectedIngredients() {
   selectedIngredientsElement.innerHTML = "";
-
   if (recipeDraftIngredients.length === 0) {
     const helper = document.createElement("p");
     helper.className = "form-helper";
@@ -499,7 +554,6 @@ function addDraftIngredient() {
   if (!ingredient || recipeDraftIngredients.includes(ingredient)) {
     return;
   }
-
   recipeDraftIngredients.push(ingredient);
   renderSelectedIngredients();
 }
@@ -520,7 +574,6 @@ function createRecipeId(title) {
 
 function addRecipe(event) {
   event.preventDefault();
-
   const title = recipeTitleInput.value.trim();
   if (!title || recipeDraftIngredients.length === 0) {
     addRecipeFeedbackElement.textContent = "Escribi un titulo y agrega al menos un ingrediente.";
@@ -528,11 +581,7 @@ function addRecipe(event) {
     return;
   }
 
-  state.customRecipes.push({
-    id: createRecipeId(title),
-    title,
-    ingredients: [...recipeDraftIngredients]
-  });
+  state.customRecipes.push({ id: createRecipeId(title), title, ingredients: [...recipeDraftIngredients] });
   state.pantryIngredients = mergeIngredientPools(state.pantryIngredients, recipeDraftIngredients);
   recipeDraftIngredients = [];
   addRecipeForm.reset();
@@ -544,10 +593,8 @@ function addRecipe(event) {
 
 function addExpense(event) {
   event.preventDefault();
-
   const amount = Number(expenseAmountInput.value);
   const description = expenseDescriptionInput.value.trim();
-
   if (!currentUser) {
     addExpenseFeedbackElement.textContent = "Primero elegi si sos SANTI o JOAQUIN arriba.";
     addExpenseFeedbackElement.dataset.tone = "error";
@@ -560,15 +607,7 @@ function addExpense(event) {
     return;
   }
 
-  state.expenses.push({
-    id: `expense-${Date.now()}`,
-    amount,
-    description,
-    paidBy: currentUser,
-    createdAt: new Date().toISOString()
-  });
-  state.expenses = mergeExpenses(state.expenses);
-
+  state.expenses = mergeExpenses(state.expenses, [{ id: `expense-${Date.now()}`, amount, description, paidBy: currentUser, createdAt: new Date().toISOString() }]);
   addExpenseForm.reset();
   addExpenseFeedbackElement.textContent = `Gasto guardado para ${currentUser}.`;
   delete addExpenseFeedbackElement.dataset.tone;
@@ -577,20 +616,16 @@ function addExpense(event) {
 }
 
 function getExpenseTotals() {
-  return state.expenses.reduce(
-    (totals, expense) => {
-      totals[expense.paidBy] += expense.amount;
-      totals.total += expense.amount;
-      return totals;
-    },
-    { SANTI: 0, JOAQUIN: 0, total: 0 }
-  );
+  return state.expenses.reduce((totals, expense) => {
+    totals[expense.paidBy] += expense.amount;
+    totals.total += expense.amount;
+    return totals;
+  }, { SANTI: 0, JOAQUIN: 0, total: 0 });
 }
 
 function renderExpenses() {
   const expenseTemplate = document.getElementById("expense-template");
   expensesListElement.innerHTML = "";
-
   if (state.expenses.length === 0) {
     const emptyState = document.createElement("p");
     emptyState.className = "empty-state";
@@ -614,46 +649,81 @@ function renderExpenseSummary() {
   const half = totals.total / 2;
   const santiNet = totals.SANTI - half;
   const joaquinNet = totals.JOAQUIN - half;
-
   spentSantiElement.textContent = formatCurrency(totals.SANTI);
   spentJoaquinElement.textContent = formatCurrency(totals.JOAQUIN);
 
   if (totals.total === 0) {
     expenseBalanceSummaryElement.textContent = "Todavia no hay gastos cargados.";
-    return;
-  }
-
-  if (Math.abs(santiNet) < 0.01 && Math.abs(joaquinNet) < 0.01) {
+  } else if (Math.abs(santiNet) < 0.01 && Math.abs(joaquinNet) < 0.01) {
     expenseBalanceSummaryElement.textContent = "Van parejos: ninguno le debe al otro.";
-    return;
-  }
-
-  if (santiNet > 0) {
+  } else if (santiNet > 0) {
     expenseBalanceSummaryElement.textContent = `JOAQUIN le debe ${formatCurrency(santiNet)} a SANTI para quedar equilibrados.`;
-    return;
+  } else {
+    expenseBalanceSummaryElement.textContent = `SANTI le debe ${formatCurrency(joaquinNet)} a JOAQUIN para quedar equilibrados.`;
   }
-
-  expenseBalanceSummaryElement.textContent = `SANTI le debe ${formatCurrency(joaquinNet)} a JOAQUIN para quedar equilibrados.`;
+}
+function setInventoryLevel(key, value) {
+  state.inventory[key] = clampPercent(value);
+  renderInventory();
+  renderShoppingSummary();
+  void persistState();
 }
 
-function renderShoppingPreview() {
-  const chosenRecipes = state.history.map((entry) => getRecipeById(entry.recipeId)).filter(Boolean);
-  if (chosenRecipes.length === 0) {
-    shoppingPreviewElement.textContent = "Cuando empecemos esta seccion, ya va a tener disponible el historial del menu y la lista de ingredientes.";
-    return;
-  }
+function refillAllInventory() {
+  state.inventory = { ...inventoryDefaults };
+  renderInventory();
+  renderShoppingSummary();
+  void persistState();
+}
 
-  const ingredientCount = {};
-  chosenRecipes.flatMap((recipe) => recipe.ingredients).forEach((ingredient) => {
-    ingredientCount[ingredient] = (ingredientCount[ingredient] || 0) + 1;
+function renderInventory() {
+  const inventoryTemplate = document.getElementById("inventory-template");
+  inventoryListElement.innerHTML = "";
+
+  ingredientCatalog.forEach((ingredient) => {
+    const fragment = inventoryTemplate.content.cloneNode(true);
+    const currentPercent = state.inventory[ingredient.key] ?? 100;
+    const item = fragment.querySelector(".inventory-item");
+    const fill = fragment.querySelector(".inventory-fill");
+
+    fragment.querySelector(".inventory-name").textContent = ingredient.label;
+    fragment.querySelector(".inventory-base").textContent = ingredient.baseLabel;
+    fragment.querySelector(".inventory-percent").textContent = `${currentPercent}%`;
+    fragment.querySelector(".inventory-usage").textContent = ingredient.usageLabel;
+    fill.style.width = `${currentPercent}%`;
+
+    if (currentPercent <= 25) {
+      item.dataset.level = "low";
+    } else if (currentPercent <= 55) {
+      item.dataset.level = "medium";
+    } else {
+      item.dataset.level = "high";
+    }
+
+    fragment.querySelectorAll(".mini-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const action = button.dataset.action;
+        if (action === "100") {
+          setInventoryLevel(ingredient.key, 100);
+          return;
+        }
+        setInventoryLevel(ingredient.key, currentPercent + Number(action));
+      });
+    });
+
+    inventoryListElement.appendChild(fragment);
   });
+}
 
-  const topIngredients = Object.entries(ingredientCount)
-    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
-    .slice(0, 3)
-    .map(([ingredient, count]) => `${ingredient} (${count})`);
+function renderShoppingSummary() {
+  const values = ingredientCatalog.map((ingredient) => state.inventory[ingredient.key] ?? 100);
+  const lowCount = values.filter((value) => value <= 25).length;
+  const average = Math.round(values.reduce((accumulator, value) => accumulator + value, 0) / values.length);
+  const lowItems = ingredientCatalog.filter((ingredient) => (state.inventory[ingredient.key] ?? 100) <= 25).map((ingredient) => ingredient.label);
 
-  shoppingPreviewElement.textContent = `Con el historial actual, los ingredientes que mas aparecen son: ${topIngredients.join(", ")}.`;
+  lowStockCountElement.textContent = String(lowCount);
+  averageStockElement.textContent = `${average}%`;
+  shoppingPreviewElement.textContent = lowItems.length > 0 ? `Conviene reponer pronto: ${lowItems.join(", ")}.` : "El stock se descuenta automaticamente cuando seleccionan comidas y despues se puede corregir a mano.";
 }
 
 function render() {
@@ -665,7 +735,8 @@ function render() {
   renderSelectedIngredients();
   renderExpenses();
   renderExpenseSummary();
-  renderShoppingPreview();
+  renderInventory();
+  renderShoppingSummary();
 }
 
 function initializeFirebaseSync() {
@@ -679,14 +750,12 @@ function initializeFirebaseSync() {
     const app = firebase.apps.length > 0 ? firebase.app() : firebase.initializeApp(window.menuSemanalFirebaseConfig);
     const database = firebase.database(app);
     menuRef = database.ref(MENU_REF_PATH);
-
     setSyncStatus("Sincronizando datos compartidos...");
 
     menuRef.on(
       "value",
       (snapshot) => {
         const remoteValue = snapshot.val();
-
         if (remoteValue) {
           state = sanitizeState(remoteValue);
           persistLocalState();
@@ -720,6 +789,7 @@ addRecipeForm.addEventListener("submit", addRecipe);
 addExpenseForm.addEventListener("submit", addExpense);
 addIngredientButton.addEventListener("click", addDraftIngredient);
 clearIngredientsButton.addEventListener("click", clearDraftIngredients);
+refillAllButton.addEventListener("click", refillAllInventory);
 
 render();
 initializeFirebaseSync();
