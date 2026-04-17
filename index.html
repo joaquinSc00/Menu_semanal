@@ -202,7 +202,7 @@
               <p class="label">Resumen</p>
             </div>
             <div class="balance-grid shopping-summary-grid">
-              <article class="balance-card">
+              <article class="balance-card clickable-card" id="low-stock-card" role="button" tabindex="0">
                 <p class="label">Ingredientes bajos</p>
                 <p class="value" id="low-stock-count">0</p>
               </article>
@@ -210,6 +210,13 @@
                 <p class="label">Promedio de stock</p>
                 <p class="value" id="average-stock">0%</p>
               </article>
+            </div>
+            <div class="low-stock-panel" id="low-stock-panel" hidden>
+              <div class="low-stock-panel-head">
+                <p class="label">Falta Reponer</p>
+                <button class="mini-button" id="close-low-stock-panel" type="button">Cerrar</button>
+              </div>
+              <div class="low-stock-items" id="low-stock-items"></div>
             </div>
             <p class="balance-summary" id="shopping-preview">
               El stock se descuenta automaticamente cuando seleccionan comidas y despues se puede corregir a mano.
