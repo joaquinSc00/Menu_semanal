@@ -1,8 +1,9 @@
-const STORAGE_KEY = "menu-semanal-rotation-v1";
+const STORAGE_KEY = "menu-semanal-rotation-v2";
 const BLOCK_TURNS = 4;
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+const PRIORITY_INGREDIENTS = ["pechuga", "lentejas"];
 
-const recipes = [
+const builtInRecipes = [
   {
     id: "jueves-almuerzo-pechuga-lentejas",
     meal: "almuerzo",
@@ -14,41 +15,41 @@ const recipes = [
     id: "jueves-almuerzo-arroz-pollo",
     meal: "almuerzo",
     title: "Arroz con pollo, caldo, queso y cebolla",
-    description: "Arroz con pollo, caldo, queso y media cebolla.",
-    ingredients: ["arroz", "pechuga", "caldo", "queso", "cebolla"]
+    description: "Arroz de cinco punados con pollo, caldo, queso y media cebolla.",
+    ingredients: ["arroz", "pollo", "caldo", "queso", "cebolla"]
   },
   {
-    id: "jueves-cena-tomate-relleno",
+    id: "jueves-cena-tomate-relleno-picadillo",
     meal: "cena",
     title: "Tomate relleno con picadillo",
-    description: "Tomate relleno frio con picadillo, huevo duro, ajo y cebolla.",
-    ingredients: ["tomate", "picadillo", "huevo", "ajo", "cebolla"]
+    description: "Tomate relleno frio con picadillo, huevo duro, ajo y media cebolla.",
+    ingredients: ["tomate", "picadillo", "huevo duro", "ajo", "cebolla"]
   },
   {
     id: "jueves-cena-costeletas-ensalada",
     meal: "cena",
-    title: "Costeletas con ensalada potente",
-    description: "Costeletas en Air Fryer con tomate, lechuga y mucha cebolla.",
-    ingredients: ["costeleta", "tomate", "lechuga", "cebolla"]
+    title: "Costeletas con ensalada de tomate, lechuga y cebolla",
+    description: "Costeletas en Air Fryer con ensalada de tomate, lechuga y una cebolla y media.",
+    ingredients: ["costeletas", "tomate", "lechuga", "cebolla", "air fryer"]
   },
   {
     id: "viernes-almuerzo-tortilla-arvejas-costeleta",
     meal: "almuerzo",
-    title: "Tortilla de arvejas con costeleta",
-    description: "Tortilla con una lata entera de arvejas, 3 huevos, queso, tomate y una costeleta.",
-    ingredients: ["arvejas", "huevo", "queso", "tomate", "costeleta"]
+    title: "Tortilla de arvejas con tomate y costeleta",
+    description: "Tortilla de arvejas con una lata entera, tres huevos, queso derretido, rodajas de tomate arriba y una costeleta.",
+    ingredients: ["arvejas", "huevo", "queso", "tomate", "costeletas"]
   },
   {
-    id: "viernes-almuerzo-arroz-huevo",
+    id: "viernes-almuerzo-arroz-huevo-frito",
     meal: "almuerzo",
-    title: "Arroz con huevo frito y queso",
-    description: "Arroz con huevo frito, queso y caldo de verdura.",
-    ingredients: ["arroz", "huevo", "queso", "caldo"]
+    title: "Arroz con huevo frito, queso y caldo",
+    description: "Arroz con huevo frito en sarten pintada, queso y caldo de verdura.",
+    ingredients: ["arroz", "huevo frito", "queso", "caldo de verdura", "sarten"]
   },
   {
     id: "viernes-cena-zapallito-revuelto",
     meal: "cena",
-    title: "Zapallito revuelto con mucha cebolla",
+    title: "Zapallito revuelto con queso y mucha cebolla",
     description: "Zapallito revuelto con queso, huevo y una cebolla y media.",
     ingredients: ["zapallito", "queso", "huevo", "cebolla"]
   },
@@ -56,69 +57,69 @@ const recipes = [
     id: "viernes-cena-jardinera-fria",
     meal: "cena",
     title: "Jardinera fria con huevos y carne",
-    description: "Una lata de jardinera con 2 huevos duros y una costeleta o pechuga.",
-    ingredients: ["jardinera", "huevo", "costeleta", "pechuga"]
+    description: "Una lata de jardinera fria con dos huevos duros y una costeleta o pechuga.",
+    ingredients: ["jardinera", "huevo duro", "costeletas", "pechuga"]
   },
   {
     id: "sabado-almuerzo-pechuga-rebozada-arroz",
     meal: "almuerzo",
     title: "Pechuga rebozada con arroz",
-    description: "Pechuga rebozada con avena y harina de almendra en Air Fryer con arroz.",
-    ingredients: ["pechuga", "avena", "harina de almendra", "arroz"]
+    description: "Pechuga rebozada con avena y harina de almendra en Air Fryer, servida con arroz.",
+    ingredients: ["pechuga", "avena", "harina de almendra", "air fryer", "arroz"]
   },
   {
     id: "sabado-almuerzo-ensalada-lentejas-carne",
     meal: "almuerzo",
     title: "Ensalada de lentejas con carne",
-    description: "Lentejas con tomate, cebolla, 2 huevos duros y carne.",
-    ingredients: ["lentejas", "tomate", "cebolla", "huevo", "carne"]
+    description: "Ensalada de lentejas con una lata entera, tomate, una cebolla, dos huevos duros y carne.",
+    ingredients: ["lentejas", "tomate", "cebolla", "huevo duro", "carne"]
   },
   {
     id: "sabado-cena-tomate-relleno",
     meal: "cena",
-    title: "Tomate relleno con picadillo y huevo",
-    description: "Tomate relleno con picadillo, huevo duro y ajo.",
-    ingredients: ["tomate", "picadillo", "huevo", "ajo"]
+    title: "Tomate relleno con picadillo, huevo duro y ajo",
+    description: "Tomate relleno frio con picadillo, huevo duro y ajo.",
+    ingredients: ["tomate", "picadillo", "huevo duro", "ajo"]
   },
   {
-    id: "sabado-cena-omelette-fiambre",
+    id: "sabado-cena-omelette-fiambre-queso",
     meal: "cena",
     title: "Omelette de fiambre y queso",
     description: "Omelette de fiambre y queso con ensalada de lechuga y tomate.",
-    ingredients: ["fiambre", "queso", "huevo", "lechuga", "tomate"]
+    ingredients: ["omelette", "fiambre", "queso", "lechuga", "tomate"]
   },
   {
     id: "domingo-almuerzo-bife-papas-huevo",
     meal: "almuerzo",
-    title: "Bife con papas y huevo frito",
-    description: "Bife o costeleta con papas en Air Fryer y huevo frito.",
-    ingredients: ["bife", "costeleta", "papas", "huevo"]
+    title: "Bife o costeleta con papas y huevo frito",
+    description: "Bife o costeleta con papas fritas en Air Fryer y huevo frito.",
+    ingredients: ["bife", "costeletas", "papas", "air fryer", "huevo frito"]
   },
   {
     id: "domingo-almuerzo-arroz-costeleta",
     meal: "almuerzo",
-    title: "Arroz con costeleta y queso",
+    title: "Arroz con caldo, queso y tiritas de costeleta",
     description: "Arroz con caldo, queso y tiritas de costeleta de cerdo.",
-    ingredients: ["arroz", "caldo", "queso", "costeleta"]
+    ingredients: ["arroz", "caldo", "queso", "costeletas", "cerdo"]
   },
   {
     id: "domingo-cena-tortilla-arvejas-pechuga",
     meal: "cena",
     title: "Tortilla de arvejas con pechuga",
-    description: "Tortilla de arvejas, 3 huevos, queso arriba y pechuga.",
+    description: "Tortilla de arvejas con una lata entera, tres huevos, queso arriba y pechuga.",
     ingredients: ["arvejas", "huevo", "queso", "pechuga"]
   },
   {
     id: "domingo-cena-zapallito-revuelto",
     meal: "cena",
     title: "Zapallito revuelto clasico",
-    description: "Zapallito revuelto con queso, huevo y mucha cebolla.",
+    description: "Zapallito revuelto con queso, huevo y una cebolla y media.",
     ingredients: ["zapallito", "queso", "huevo", "cebolla"]
   },
   {
     id: "lunes-almuerzo-jardinera-pechuga",
     meal: "almuerzo",
-    title: "Jardinera fria con pechuga",
+    title: "Jardinera fria con huevo y pechuga",
     description: "Jardinera fria con huevo y pechuga a la plancha.",
     ingredients: ["jardinera", "huevo", "pechuga"]
   },
@@ -127,51 +128,60 @@ const recipes = [
     meal: "almuerzo",
     title: "Arroz con choclo, queso y costeleta",
     description: "Arroz con medio choclo en lata, queso y costeleta.",
-    ingredients: ["arroz", "choclo", "queso", "costeleta"]
+    ingredients: ["arroz", "choclo", "queso", "costeletas"]
   },
   {
     id: "lunes-cena-tomate-relleno",
     meal: "cena",
-    title: "Tomate relleno con ajo",
+    title: "Tomate relleno con picadillo y ajo",
     description: "Tomate relleno con picadillo, huevo duro y ajo.",
-    ingredients: ["tomate", "picadillo", "huevo", "ajo"]
+    ingredients: ["tomate", "picadillo", "huevo duro", "ajo"]
   },
   {
     id: "lunes-cena-costeletas-ensalada",
     meal: "cena",
     title: "Costeletas con ensalada fresca",
-    description: "Costeletas con tomate, lechuga y cebolla.",
-    ingredients: ["costeleta", "tomate", "lechuga", "cebolla"]
+    description: "Costeletas con ensalada de tomate, lechuga y cebolla.",
+    ingredients: ["costeletas", "tomate", "lechuga", "cebolla"]
   },
   {
     id: "martes-almuerzo-tortilla-arvejas-carne",
     meal: "almuerzo",
-    title: "Tortilla de arvejas con carne y salsa",
-    description: "Tortilla de arvejas con 3 huevos, salsa de tomate arriba y carne.",
+    title: "Tortilla de arvejas con salsa de tomate y carne",
+    description: "Tortilla de arvejas con una lata entera, tres huevos, salsa de tomate arriba y carne.",
     ingredients: ["arvejas", "huevo", "salsa de tomate", "carne"]
   },
   {
-    id: "martes-almuerzo-papas-cebolla-huevo",
+    id: "martes-almuerzo-papas-cebollas-air-fryer",
     meal: "almuerzo",
-    title: "Papas y cebollas en Air Fryer",
-    description: "Papas y cebollas con especias en Air Fryer, acompañadas con 2 huevos fritos.",
-    ingredients: ["papas", "cebolla", "huevo"]
+    title: "Papas y cebollas en Air Fryer con huevos fritos",
+    description: "Papas y cebollas con especias en Air Fryer, acompanadas con dos huevos fritos.",
+    ingredients: ["papas", "cebolla", "especias", "air fryer", "huevo frito"]
   },
   {
     id: "martes-cena-ensalada-lentejas",
     meal: "cena",
-    title: "Ensalada de lentejas",
-    description: "Lentejas con tomate, cebolla y huevo duro.",
-    ingredients: ["lentejas", "tomate", "cebolla", "huevo"]
+    title: "Ensalada de lentejas con huevo duro",
+    description: "Ensalada de lentejas con una lata entera, tomate, cebolla y huevo duro.",
+    ingredients: ["lentejas", "tomate", "cebolla", "huevo duro"]
   },
   {
-    id: "martes-cena-omelette-fiambre",
+    id: "martes-cena-omelette-fiambre-queso",
     meal: "cena",
     title: "Omelette de fiambre y queso con ensalada",
-    description: "Omelette de fiambre y queso con tomate y lechuga.",
-    ingredients: ["fiambre", "queso", "huevo", "tomate", "lechuga"]
+    description: "Omelette de fiambre y queso con ensalada de tomate y lechuga.",
+    ingredients: ["omelette", "fiambre", "queso", "tomate", "lechuga"]
   }
 ];
+
+const baseIngredientPool = Array.from(
+  new Set(
+    builtInRecipes
+      .flatMap((recipe) => recipe.ingredients)
+      .map(normalizeIngredient)
+      .filter(Boolean)
+  )
+).sort((left, right) => left.localeCompare(right));
 
 const defaultState = {
   currentMeal: "cena",
@@ -181,7 +191,9 @@ const defaultState = {
       recipeId: "jueves-almuerzo-pechuga-lentejas",
       selectedAt: "Jueves - Almuerzo"
     }
-  ]
+  ],
+  customRecipes: [],
+  pantryIngredients: baseIngredientPool
 };
 
 const currentDayElement = document.getElementById("current-day");
@@ -194,25 +206,96 @@ const lunchButton = document.getElementById("lunch-button");
 const dinnerButton = document.getElementById("dinner-button");
 const undoButton = document.getElementById("undo-button");
 const resetButton = document.getElementById("reset-button");
+const addRecipeForm = document.getElementById("add-recipe-form");
+const recipeTitleInput = document.getElementById("recipe-title-input");
+const recipeMealSelect = document.getElementById("recipe-meal-input");
+const recipeDescriptionInput = document.getElementById("recipe-description-input");
+const recipeIngredientsInput = document.getElementById("recipe-ingredients-input");
+const ingredientSuggestionsElement = document.getElementById("ingredient-suggestions");
+const addRecipeFeedbackElement = document.getElementById("add-recipe-feedback");
 
 let state = loadState();
 
+function normalizeIngredient(value) {
+  return value.trim().toLowerCase();
+}
+
+function prettifyIngredient(value) {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(" ");
+}
+
+function buildRecipes() {
+  return [...builtInRecipes, ...state.customRecipes];
+}
+
 function loadState() {
   const savedState = window.localStorage.getItem(STORAGE_KEY);
+
   if (!savedState) {
     return structuredClone(defaultState);
   }
 
   try {
     const parsed = JSON.parse(savedState);
+    const customRecipes = Array.isArray(parsed.customRecipes)
+      ? parsed.customRecipes.map(sanitizeRecipe).filter(Boolean)
+      : [];
+    const pantryIngredients = mergeIngredientPools(
+      baseIngredientPool,
+      Array.isArray(parsed.pantryIngredients) ? parsed.pantryIngredients : [],
+      customRecipes.flatMap((recipe) => recipe.ingredients)
+    );
+
     return {
-      currentMeal: parsed.currentMeal || defaultState.currentMeal,
+      currentMeal: parsed.currentMeal === "almuerzo" ? "almuerzo" : "cena",
       currentDayIndex: Number.isInteger(parsed.currentDayIndex) ? parsed.currentDayIndex : defaultState.currentDayIndex,
-      history: Array.isArray(parsed.history) ? parsed.history : structuredClone(defaultState.history)
+      history: Array.isArray(parsed.history) ? parsed.history : structuredClone(defaultState.history),
+      customRecipes,
+      pantryIngredients
     };
   } catch (error) {
     return structuredClone(defaultState);
   }
+}
+
+function sanitizeRecipe(recipe) {
+  if (!recipe || typeof recipe !== "object") {
+    return null;
+  }
+
+  const title = typeof recipe.title === "string" ? recipe.title.trim() : "";
+  const meal = recipe.meal === "almuerzo" ? "almuerzo" : recipe.meal === "cena" ? "cena" : "";
+  const description = typeof recipe.description === "string" ? recipe.description.trim() : "";
+  const ingredients = Array.isArray(recipe.ingredients)
+    ? Array.from(new Set(recipe.ingredients.map(normalizeIngredient).filter(Boolean)))
+    : [];
+
+  if (!title || !meal || !description || ingredients.length === 0) {
+    return null;
+  }
+
+  return {
+    id: typeof recipe.id === "string" && recipe.id.trim() ? recipe.id.trim() : createRecipeId(title),
+    meal,
+    title,
+    description,
+    ingredients
+  };
+}
+
+function mergeIngredientPools(...ingredientLists) {
+  return Array.from(
+    new Set(
+      ingredientLists
+        .flat()
+        .map((ingredient) => normalizeIngredient(String(ingredient)))
+        .filter(Boolean)
+    )
+  ).sort((left, right) => left.localeCompare(right));
 }
 
 function saveState() {
@@ -220,7 +303,7 @@ function saveState() {
 }
 
 function getRecipeById(recipeId) {
-  return recipes.find((recipe) => recipe.id === recipeId);
+  return buildRecipes().find((recipe) => recipe.id === recipeId);
 }
 
 function getLastHistoryEntry(offset = 0) {
@@ -322,8 +405,7 @@ function scoreRecipe(recipe) {
     reasons.push(`Tambien repite ingredientes recientes: ${olderOverlap.join(", ")}`);
   }
 
-  const priorityIngredients = ["pechuga", "lentejas"];
-  const delayedIngredients = recipe.ingredients.filter((ingredient) => priorityIngredients.includes(ingredient));
+  const delayedIngredients = recipe.ingredients.filter((ingredient) => PRIORITY_INGREDIENTS.includes(ingredient));
   if (delayedIngredients.length > 0) {
     score += delayedIngredients.length * 35;
     reasons.push(`Va mas al fondo por usar ${delayedIngredients.join(" y ")}`);
@@ -359,7 +441,7 @@ function scoreRecipe(recipe) {
 }
 
 function getRecipesForCurrentMeal() {
-  return recipes
+  return buildRecipes()
     .filter((recipe) => recipe.meal === state.currentMeal)
     .map((recipe) => ({ recipe, ...scoreRecipe(recipe) }))
     .sort((left, right) => left.score - right.score || left.recipe.title.localeCompare(right.recipe.title));
@@ -454,15 +536,93 @@ function renderSummary() {
   }
 }
 
+function renderIngredientSuggestions() {
+  ingredientSuggestionsElement.innerHTML = "";
+
+  state.pantryIngredients.forEach((ingredient) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ingredient-chip";
+    button.textContent = prettifyIngredient(ingredient);
+    button.addEventListener("click", () => appendIngredientToInput(ingredient));
+    ingredientSuggestionsElement.appendChild(button);
+  });
+}
+
+function appendIngredientToInput(ingredient) {
+  const currentIngredients = parseIngredientInput(recipeIngredientsInput.value);
+  if (currentIngredients.includes(ingredient)) {
+    return;
+  }
+
+  currentIngredients.push(ingredient);
+  recipeIngredientsInput.value = currentIngredients.join(", ");
+  recipeIngredientsInput.focus();
+}
+
+function parseIngredientInput(rawValue) {
+  return Array.from(
+    new Set(
+      rawValue
+        .split(",")
+        .map(normalizeIngredient)
+        .filter(Boolean)
+    )
+  );
+}
+
+function createRecipeId(title) {
+  return `manual-${title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")}-${Date.now()}`;
+}
+
+function addRecipe(event) {
+  event.preventDefault();
+
+  const title = recipeTitleInput.value.trim();
+  const meal = recipeMealSelect.value;
+  const description = recipeDescriptionInput.value.trim();
+  const ingredients = parseIngredientInput(recipeIngredientsInput.value);
+
+  if (!title || !description || ingredients.length === 0) {
+    addRecipeFeedbackElement.textContent = "Completa titulo, descripcion e ingredientes para guardar la receta.";
+    addRecipeFeedbackElement.dataset.tone = "error";
+    return;
+  }
+
+  const recipe = {
+    id: createRecipeId(title),
+    title,
+    meal,
+    description,
+    ingredients
+  };
+
+  state.customRecipes.push(recipe);
+  state.pantryIngredients = mergeIngredientPools(state.pantryIngredients, ingredients);
+  saveState();
+
+  addRecipeForm.reset();
+  addRecipeFeedbackElement.textContent = `Se agrego "${title}" y ya entra en la rotacion de ${meal}.`;
+  addRecipeFeedbackElement.dataset.tone = "success";
+  render();
+}
+
 function render() {
   renderSummary();
   renderRecipes();
   renderHistory();
+  renderIngredientSuggestions();
 }
 
 lunchButton.addEventListener("click", () => setMeal("almuerzo"));
 dinnerButton.addEventListener("click", () => setMeal("cena"));
 undoButton.addEventListener("click", undoLastSelection);
 resetButton.addEventListener("click", resetState);
+addRecipeForm.addEventListener("submit", addRecipe);
 
 render();
