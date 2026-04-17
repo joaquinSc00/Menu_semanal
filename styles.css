@@ -214,6 +214,98 @@ button {
   gap: 14px;
 }
 
+.recipe-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field-wide {
+  grid-column: span 2;
+}
+
+.field-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text);
+  padding: 12px 14px;
+  font: inherit;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: 2px solid rgba(64, 98, 74, 0.2);
+  border-color: rgba(64, 98, 74, 0.45);
+}
+
+.ingredient-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ingredient-chip {
+  border: 1px solid rgba(64, 98, 74, 0.14);
+  border-radius: 999px;
+  background: rgba(64, 98, 74, 0.08);
+  color: var(--accent);
+  padding: 8px 12px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 140ms ease, background-color 140ms ease;
+}
+
+.ingredient-chip:hover {
+  transform: translateY(-1px);
+  background: rgba(64, 98, 74, 0.14);
+}
+
+.form-actions {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.form-feedback {
+  margin: 0;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.form-feedback[data-tone="success"] {
+  color: var(--accent);
+}
+
+.form-feedback[data-tone="error"] {
+  color: var(--danger);
+}
+
 .recipe-card,
 .history-item {
   display: flex;
@@ -349,6 +441,15 @@ button {
 
   .status-grid {
     grid-template-columns: 1fr;
+  }
+
+  .recipe-form {
+    grid-template-columns: 1fr;
+  }
+
+  .field-wide,
+  .form-actions {
+    grid-column: span 1;
   }
 
   .recipe-card,
