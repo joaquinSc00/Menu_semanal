@@ -402,7 +402,8 @@ select {
 
 .recipes-list,
 .history-list,
-.expenses-list {
+.expenses-list,
+.inventory-list {
   display: grid;
   gap: 14px;
 }
@@ -566,6 +567,68 @@ select {
 
 .future-card {
   min-height: 180px;
+}
+
+.shopping-summary-grid {
+  margin-bottom: 12px;
+}
+
+.inventory-item {
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.inventory-head,
+.inventory-foot,
+.inventory-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inventory-percent {
+  font-size: 1.2rem;
+}
+
+.inventory-bar {
+  width: 100%;
+  height: 14px;
+  margin: 14px 0;
+  border-radius: 999px;
+  background: rgba(42, 35, 29, 0.08);
+  overflow: hidden;
+}
+
+.inventory-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6ea46d, #3d6e43);
+}
+
+.inventory-item[data-level=\"medium\"] .inventory-fill {
+  background: linear-gradient(90deg, #d8ae45, #b17b20);
+}
+
+.inventory-item[data-level=\"low\"] .inventory-fill {
+  background: linear-gradient(90deg, #d46857, #a73730);
+}
+
+.mini-button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mini-button:hover {
+  transform: translateY(-1px);
 }
 
 .back-to-top {
