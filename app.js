@@ -1,132 +1,35 @@
 const STORAGE_KEY = "menu-semanal-rotation-v3";
+const MENU_REF_PATH = "menuSemanal/sharedState";
 const BLOCK_TURNS = 4;
 
 const builtInRecipes = [
-  {
-    id: "pechuga-lentejas-huevo-cebolla",
-    title: "Pechuga con lentejas, huevo y cebolla",
-    ingredients: ["pechuga", "lentejas", "huevo", "cebolla"]
-  },
-  {
-    id: "arroz-pollo-caldo-queso-cebolla",
-    title: "Arroz con pollo, caldo, queso y cebolla",
-    ingredients: ["arroz", "pollo", "caldo", "queso", "cebolla"]
-  },
-  {
-    id: "tomate-relleno-picadillo-huevo-ajo-cebolla",
-    title: "Tomate relleno con picadillo",
-    ingredients: ["tomate", "picadillo", "huevo duro", "ajo", "cebolla"]
-  },
-  {
-    id: "costeletas-ensalada-cebolla",
-    title: "Costeletas con ensalada de tomate, lechuga y cebolla",
-    ingredients: ["costeletas", "tomate", "lechuga", "cebolla", "air fryer"]
-  },
-  {
-    id: "tortilla-arvejas-costeleta",
-    title: "Tortilla de arvejas con tomate y costeleta",
-    ingredients: ["arvejas", "huevo", "queso", "tomate", "costeletas"]
-  },
-  {
-    id: "arroz-huevo-frito-queso-caldo",
-    title: "Arroz con huevo frito, queso y caldo",
-    ingredients: ["arroz", "huevo frito", "queso", "caldo de verdura", "sarten"]
-  },
-  {
-    id: "zapallito-revuelto-cebolla",
-    title: "Zapallito revuelto con queso y mucha cebolla",
-    ingredients: ["zapallito", "queso", "huevo", "cebolla"]
-  },
-  {
-    id: "jardinera-fria-huevos-carne",
-    title: "Jardinera fria con huevos y carne",
-    ingredients: ["jardinera", "huevo duro", "costeletas", "pechuga"]
-  },
-  {
-    id: "pechuga-rebozada-arroz",
-    title: "Pechuga rebozada con arroz",
-    ingredients: ["pechuga", "avena", "harina de almendra", "air fryer", "arroz"]
-  },
-  {
-    id: "ensalada-lentejas-carne",
-    title: "Ensalada de lentejas con carne",
-    ingredients: ["lentejas", "tomate", "cebolla", "huevo duro", "carne"]
-  },
-  {
-    id: "tomate-relleno-ajo",
-    title: "Tomate relleno con picadillo, huevo duro y ajo",
-    ingredients: ["tomate", "picadillo", "huevo duro", "ajo"]
-  },
-  {
-    id: "omelette-fiambre-queso",
-    title: "Omelette de fiambre y queso",
-    ingredients: ["omelette", "fiambre", "queso", "lechuga", "tomate"]
-  },
-  {
-    id: "bife-papas-huevo-frito",
-    title: "Bife o costeleta con papas y huevo frito",
-    ingredients: ["bife", "costeletas", "papas", "air fryer", "huevo frito"]
-  },
-  {
-    id: "arroz-tiritas-costeleta",
-    title: "Arroz con caldo, queso y tiritas de costeleta",
-    ingredients: ["arroz", "caldo", "queso", "costeletas", "cerdo"]
-  },
-  {
-    id: "tortilla-arvejas-pechuga",
-    title: "Tortilla de arvejas con pechuga",
-    ingredients: ["arvejas", "huevo", "queso", "pechuga"]
-  },
-  {
-    id: "zapallito-revuelto-clasico",
-    title: "Zapallito revuelto clasico",
-    ingredients: ["zapallito", "queso", "huevo", "cebolla"]
-  },
-  {
-    id: "jardinera-pechuga",
-    title: "Jardinera fria con huevo y pechuga",
-    ingredients: ["jardinera", "huevo", "pechuga"]
-  },
-  {
-    id: "arroz-choclo-costeleta",
-    title: "Arroz con choclo, queso y costeleta",
-    ingredients: ["arroz", "choclo", "queso", "costeletas"]
-  },
-  {
-    id: "costeletas-ensalada-fresca",
-    title: "Costeletas con ensalada fresca",
-    ingredients: ["costeletas", "tomate", "lechuga", "cebolla"]
-  },
-  {
-    id: "tortilla-arvejas-salsa-carne",
-    title: "Tortilla de arvejas con salsa de tomate y carne",
-    ingredients: ["arvejas", "huevo", "salsa de tomate", "carne"]
-  },
-  {
-    id: "papas-cebollas-air-fryer",
-    title: "Papas y cebollas en Air Fryer con huevos fritos",
-    ingredients: ["papas", "cebolla", "especias", "air fryer", "huevo frito"]
-  },
-  {
-    id: "ensalada-lentejas-huevo-duro",
-    title: "Ensalada de lentejas con huevo duro",
-    ingredients: ["lentejas", "tomate", "cebolla", "huevo duro"]
-  },
-  {
-    id: "omelette-fiambre-queso-ensalada",
-    title: "Omelette de fiambre y queso con ensalada",
-    ingredients: ["omelette", "fiambre", "queso", "tomate", "lechuga"]
-  }
+  { id: "pechuga-lentejas-huevo-cebolla", title: "Pechuga con lentejas, huevo y cebolla", ingredients: ["pechuga", "lentejas", "huevo", "cebolla"] },
+  { id: "arroz-pollo-caldo-queso-cebolla", title: "Arroz con pollo, caldo, queso y cebolla", ingredients: ["arroz", "pollo", "caldo", "queso", "cebolla"] },
+  { id: "tomate-relleno-picadillo-huevo-ajo-cebolla", title: "Tomate relleno con picadillo", ingredients: ["tomate", "picadillo", "huevo duro", "ajo", "cebolla"] },
+  { id: "costeletas-ensalada-cebolla", title: "Costeletas con ensalada de tomate, lechuga y cebolla", ingredients: ["costeletas", "tomate", "lechuga", "cebolla", "air fryer"] },
+  { id: "tortilla-arvejas-costeleta", title: "Tortilla de arvejas con tomate y costeleta", ingredients: ["arvejas", "huevo", "queso", "tomate", "costeletas"] },
+  { id: "arroz-huevo-frito-queso-caldo", title: "Arroz con huevo frito, queso y caldo", ingredients: ["arroz", "huevo frito", "queso", "caldo de verdura", "sarten"] },
+  { id: "zapallito-revuelto-cebolla", title: "Zapallito revuelto con queso y mucha cebolla", ingredients: ["zapallito", "queso", "huevo", "cebolla"] },
+  { id: "jardinera-fria-huevos-carne", title: "Jardinera fria con huevos y carne", ingredients: ["jardinera", "huevo duro", "costeletas", "pechuga"] },
+  { id: "pechuga-rebozada-arroz", title: "Pechuga rebozada con arroz", ingredients: ["pechuga", "avena", "harina de almendra", "air fryer", "arroz"] },
+  { id: "ensalada-lentejas-carne", title: "Ensalada de lentejas con carne", ingredients: ["lentejas", "tomate", "cebolla", "huevo duro", "carne"] },
+  { id: "tomate-relleno-ajo", title: "Tomate relleno con picadillo, huevo duro y ajo", ingredients: ["tomate", "picadillo", "huevo duro", "ajo"] },
+  { id: "omelette-fiambre-queso", title: "Omelette de fiambre y queso", ingredients: ["omelette", "fiambre", "queso", "lechuga", "tomate"] },
+  { id: "bife-papas-huevo-frito", title: "Bife o costeleta con papas y huevo frito", ingredients: ["bife", "costeletas", "papas", "air fryer", "huevo frito"] },
+  { id: "arroz-tiritas-costeleta", title: "Arroz con caldo, queso y tiritas de costeleta", ingredients: ["arroz", "caldo", "queso", "costeletas", "cerdo"] },
+  { id: "tortilla-arvejas-pechuga", title: "Tortilla de arvejas con pechuga", ingredients: ["arvejas", "huevo", "queso", "pechuga"] },
+  { id: "zapallito-revuelto-clasico", title: "Zapallito revuelto clasico", ingredients: ["zapallito", "queso", "huevo", "cebolla"] },
+  { id: "jardinera-pechuga", title: "Jardinera fria con huevo y pechuga", ingredients: ["jardinera", "huevo", "pechuga"] },
+  { id: "arroz-choclo-costeleta", title: "Arroz con choclo, queso y costeleta", ingredients: ["arroz", "choclo", "queso", "costeletas"] },
+  { id: "costeletas-ensalada-fresca", title: "Costeletas con ensalada fresca", ingredients: ["costeletas", "tomate", "lechuga", "cebolla"] },
+  { id: "tortilla-arvejas-salsa-carne", title: "Tortilla de arvejas con salsa de tomate y carne", ingredients: ["arvejas", "huevo", "salsa de tomate", "carne"] },
+  { id: "papas-cebollas-air-fryer", title: "Papas y cebollas en Air Fryer con huevos fritos", ingredients: ["papas", "cebolla", "especias", "air fryer", "huevo frito"] },
+  { id: "ensalada-lentejas-huevo-duro", title: "Ensalada de lentejas con huevo duro", ingredients: ["lentejas", "tomate", "cebolla", "huevo duro"] },
+  { id: "omelette-fiambre-queso-ensalada", title: "Omelette de fiambre y queso con ensalada", ingredients: ["omelette", "fiambre", "queso", "tomate", "lechuga"] }
 ];
 
-const baseIngredientPool = Array.from(
-  new Set(
-    builtInRecipes
-      .flatMap((recipe) => recipe.ingredients)
-      .map(normalizeIngredient)
-      .filter(Boolean)
-  )
-).sort((left, right) => left.localeCompare(right));
+const baseIngredientPool = Array.from(new Set(builtInRecipes.flatMap((recipe) => recipe.ingredients).map(normalizeIngredient).filter(Boolean)))
+  .sort((left, right) => left.localeCompare(right));
 
 const defaultState = {
   history: [],
@@ -136,6 +39,7 @@ const defaultState = {
 
 const lastMealElement = document.getElementById("last-meal");
 const prioritySummaryElement = document.getElementById("priority-summary");
+const syncStatusElement = document.getElementById("sync-status");
 const recipesListElement = document.getElementById("recipes-list");
 const historyListElement = document.getElementById("history-list");
 const undoButton = document.getElementById("undo-button");
@@ -148,8 +52,10 @@ const addIngredientButton = document.getElementById("add-ingredient-button");
 const clearIngredientsButton = document.getElementById("clear-ingredients-button");
 const addRecipeFeedbackElement = document.getElementById("add-recipe-feedback");
 
-let state = loadState();
+let state = loadCachedState();
 let recipeDraftIngredients = [];
+let menuRef = null;
+let isHydratedFromRemote = false;
 
 function normalizeIngredient(value) {
   return value.trim().toLowerCase();
@@ -163,34 +69,18 @@ function prettifyIngredient(value) {
     .join(" ");
 }
 
-function buildRecipes() {
-  return [...builtInRecipes, ...state.customRecipes];
+function setSyncStatus(message, tone = "default") {
+  syncStatusElement.textContent = message;
+  if (tone === "default") {
+    delete syncStatusElement.dataset.tone;
+    return;
+  }
+
+  syncStatusElement.dataset.tone = tone;
 }
 
-function loadState() {
-  const savedState = window.localStorage.getItem(STORAGE_KEY);
-  if (!savedState) {
-    return structuredClone(defaultState);
-  }
-
-  try {
-    const parsed = JSON.parse(savedState);
-    const customRecipes = Array.isArray(parsed.customRecipes)
-      ? parsed.customRecipes.map(sanitizeRecipe).filter(Boolean)
-      : [];
-
-    return {
-      history: Array.isArray(parsed.history) ? parsed.history : [],
-      customRecipes,
-      pantryIngredients: mergeIngredientPools(
-        baseIngredientPool,
-        Array.isArray(parsed.pantryIngredients) ? parsed.pantryIngredients : [],
-        customRecipes.flatMap((recipe) => recipe.ingredients)
-      )
-    };
-  } catch (error) {
-    return structuredClone(defaultState);
-  }
+function buildRecipes() {
+  return [...builtInRecipes, ...state.customRecipes];
 }
 
 function sanitizeRecipe(recipe) {
@@ -214,6 +104,29 @@ function sanitizeRecipe(recipe) {
   };
 }
 
+function sanitizeState(rawState) {
+  const customRecipes = Array.isArray(rawState?.customRecipes)
+    ? rawState.customRecipes.map(sanitizeRecipe).filter(Boolean)
+    : [];
+
+  return {
+    history: Array.isArray(rawState?.history)
+      ? rawState.history
+          .filter((entry) => entry && typeof entry.recipeId === "string")
+          .map((entry) => ({
+            recipeId: entry.recipeId,
+            selectedAt: typeof entry.selectedAt === "string" ? entry.selectedAt : new Date().toLocaleString("es-AR")
+          }))
+      : [],
+    customRecipes,
+    pantryIngredients: mergeIngredientPools(
+      baseIngredientPool,
+      Array.isArray(rawState?.pantryIngredients) ? rawState.pantryIngredients : [],
+      customRecipes.flatMap((recipe) => recipe.ingredients)
+    )
+  };
+}
+
 function mergeIngredientPools(...ingredientLists) {
   return Array.from(
     new Set(
@@ -225,8 +138,37 @@ function mergeIngredientPools(...ingredientLists) {
   ).sort((left, right) => left.localeCompare(right));
 }
 
-function saveState() {
+function loadCachedState() {
+  const savedState = window.localStorage.getItem(STORAGE_KEY);
+  if (!savedState) {
+    return structuredClone(defaultState);
+  }
+
+  try {
+    return sanitizeState(JSON.parse(savedState));
+  } catch (error) {
+    return structuredClone(defaultState);
+  }
+}
+
+function persistLocalState() {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function persistState() {
+  persistLocalState();
+
+  if (!menuRef) {
+    return Promise.resolve();
+  }
+
+  return menuRef.set(state)
+    .then(() => {
+      setSyncStatus("Menu sincronizado entre dispositivos.");
+    })
+    .catch(() => {
+      setSyncStatus("Se guardo solo en este dispositivo. Revisa Firebase o tu conexion.", "warning");
+    });
 }
 
 function getRecipeById(recipeId) {
@@ -258,8 +200,8 @@ function selectRecipe(recipeId) {
     selectedAt: new Date().toLocaleString("es-AR")
   });
 
-  saveState();
   render();
+  void persistState();
 }
 
 function undoLastSelection() {
@@ -268,15 +210,15 @@ function undoLastSelection() {
   }
 
   state.history.pop();
-  saveState();
   render();
+  void persistState();
 }
 
 function resetState() {
   state = structuredClone(defaultState);
   recipeDraftIngredients = [];
-  saveState();
   render();
+  void persistState();
 }
 
 function scoreRecipe(recipe) {
@@ -401,19 +343,15 @@ function renderSummary() {
   const lastEntry = getLastHistoryEntry();
   const lastRecipe = lastEntry ? getRecipeById(lastEntry.recipeId) : null;
   const visibleRecipes = getVisibleRecipes();
-  const hiddenCount = getBlockedIds().length;
+  const hiddenCount = Math.min(getBlockedIds().length, buildRecipes().length);
 
-  if (lastRecipe) {
-    lastMealElement.textContent = `${lastRecipe.title} (${lastEntry.selectedAt})`;
-  } else {
-    lastMealElement.textContent = "Todavia no hay historial.";
-  }
+  lastMealElement.textContent = lastRecipe
+    ? `${lastRecipe.title} (${lastEntry.selectedAt})`
+    : "Todavia no hay historial.";
 
-  if (visibleRecipes[0]) {
-    prioritySummaryElement.textContent = `Hay ${visibleRecipes.length} comidas visibles y ${hiddenCount} ocultas por rotacion.`;
-  } else {
-    prioritySummaryElement.textContent = "Todas las comidas quedaron ocultas temporalmente por las ultimas selecciones.";
-  }
+  prioritySummaryElement.textContent = visibleRecipes[0]
+    ? `Hay ${visibleRecipes.length} comidas visibles y ${hiddenCount} ocultas por rotacion.`
+    : "Todas las comidas quedaron ocultas temporalmente por las ultimas selecciones.";
 }
 
 function renderIngredientSelect() {
@@ -495,13 +433,12 @@ function addRecipe(event) {
 
   state.customRecipes.push(recipe);
   state.pantryIngredients = mergeIngredientPools(state.pantryIngredients, recipe.ingredients);
-  saveState();
-
-  addRecipeForm.reset();
   recipeDraftIngredients = [];
-  addRecipeFeedbackElement.textContent = `Se agrego "${title}" a la lista.`;
+  addRecipeForm.reset();
+  addRecipeFeedbackElement.textContent = `Se agrego "${title}" a la lista compartida.`;
   addRecipeFeedbackElement.dataset.tone = "success";
   render();
+  void persistState();
 }
 
 function render() {
@@ -512,6 +449,52 @@ function render() {
   renderSelectedIngredients();
 }
 
+function initializeFirebaseSync() {
+  if (!window.firebase || !window.menuSemanalFirebaseConfig) {
+    setSyncStatus("Firebase no esta disponible. El menu funciona solo en este dispositivo.", "warning");
+    render();
+    return;
+  }
+
+  try {
+    const app = firebase.apps.length > 0
+      ? firebase.app()
+      : firebase.initializeApp(window.menuSemanalFirebaseConfig);
+    const database = firebase.database(app);
+    menuRef = database.ref(MENU_REF_PATH);
+
+    setSyncStatus("Sincronizando menu compartido...");
+
+    menuRef.on(
+      "value",
+      (snapshot) => {
+        const remoteValue = snapshot.val();
+
+        if (remoteValue) {
+          state = sanitizeState(remoteValue);
+          persistLocalState();
+          isHydratedFromRemote = true;
+          setSyncStatus("Menu sincronizado entre dispositivos.");
+          render();
+          return;
+        }
+
+        if (!isHydratedFromRemote) {
+          isHydratedFromRemote = true;
+          void persistState();
+        }
+      },
+      () => {
+        setSyncStatus("No se pudo leer Firebase. Se usa la copia local.", "warning");
+        render();
+      }
+    );
+  } catch (error) {
+    setSyncStatus("Error al iniciar Firebase. El menu queda solo local.", "error");
+    render();
+  }
+}
+
 undoButton.addEventListener("click", undoLastSelection);
 resetButton.addEventListener("click", resetState);
 addRecipeForm.addEventListener("submit", addRecipe);
@@ -519,3 +502,4 @@ addIngredientButton.addEventListener("click", addDraftIngredient);
 clearIngredientsButton.addEventListener("click", clearDraftIngredients);
 
 render();
+initializeFirebaseSync();
