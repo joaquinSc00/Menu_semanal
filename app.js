@@ -147,12 +147,18 @@ const lowStockCountElement = document.getElementById("low-stock-count");
 const averageStockElement = document.getElementById("average-stock");
 const inventoryListElement = document.getElementById("inventory-list");
 const refillAllButton = document.getElementById("refill-all-button");
+const lowStockCardElement = document.getElementById("low-stock-card");
+const lowStockPanelElement = document.getElementById("low-stock-panel");
+const lowStockItemsElement = document.getElementById("low-stock-items");
+const closeLowStockPanelButton = document.getElementById("close-low-stock-panel");
 
 let state = loadCachedState();
 let currentUser = loadCurrentUser();
 let recipeDraftIngredients = [];
 let menuRef = null;
 let isHydratedFromRemote = false;
+let inventoryReorderPausedUntil = 0;
+let inventoryReorderTimer = null;
 
 function normalizeIngredient(value) {
   return value.trim().toLowerCase();
@@ -662,25 +668,54 @@ function renderExpenseSummary() {
     expenseBalanceSummaryElement.textContent = `SANTI le debe ${formatCurrency(joaquinNet)} a JOAQUIN para quedar equilibrados.`;
   }
 }
+function scheduleInventoryReorder() {
+  if (inventoryReorderTimer) {
+    window.clearTimeout(inventoryReorderTimer);
+  }
+
+  const remainingMs = Math.max(0, inventoryReorderPausedUntil - Date.now());
+  inventoryReorderTimer = window.setTimeout(() => {
+    inventoryReorderTimer = null;
+    renderInventory();
+  }, remainingMs + 20);
+}
+
 function setInventoryLevel(key, value) {
   state.inventory[key] = clampPercent(value);
+  inventoryReorderPausedUntil = Date.now() + 10000;
   renderInventory();
   renderShoppingSummary();
+  scheduleInventoryReorder();
   void persistState();
 }
 
 function refillAllInventory() {
   state.inventory = { ...inventoryDefaults };
+  inventoryReorderPausedUntil = Date.now() + 10000;
   renderInventory();
   renderShoppingSummary();
+  scheduleInventoryReorder();
   void persistState();
+}
+
+function getInventoryEntriesForRender() {
+  const entries = [...ingredientCatalog];
+  if (Date.now() < inventoryReorderPausedUntil) {
+    return entries;
+  }
+
+  return entries.sort((left, right) => {
+    const leftValue = state.inventory[left.key] ?? 100;
+    const rightValue = state.inventory[right.key] ?? 100;
+    return leftValue - rightValue || left.label.localeCompare(right.label);
+  });
 }
 
 function renderInventory() {
   const inventoryTemplate = document.getElementById("inventory-template");
   inventoryListElement.innerHTML = "";
 
-  ingredientCatalog.forEach((ingredient) => {
+  getInventoryEntriesForRender().forEach((ingredient) => {
     const fragment = inventoryTemplate.content.cloneNode(true);
     const currentPercent = state.inventory[ingredient.key] ?? 100;
     const item = fragment.querySelector(".inventory-item");
@@ -715,6 +750,38 @@ function renderInventory() {
   });
 }
 
+function toggleLowStockPanel(forceOpen) {
+  const shouldOpen = typeof forceOpen === "boolean" ? forceOpen : lowStockPanelElement.hidden;
+  lowStockPanelElement.hidden = !shouldOpen;
+}
+
+function renderLowStockPanel() {
+  const lowItems = ingredientCatalog
+    .map((ingredient) => ({
+      label: ingredient.label,
+      percent: state.inventory[ingredient.key] ?? 100
+    }))
+    .filter((ingredient) => ingredient.percent <= 25)
+    .sort((left, right) => left.percent - right.percent || left.label.localeCompare(right.label));
+
+  lowStockItemsElement.innerHTML = "";
+
+  if (lowItems.length === 0) {
+    const emptyState = document.createElement("p");
+    emptyState.className = "empty-state";
+    emptyState.textContent = "No hay ingredientes criticos por ahora.";
+    lowStockItemsElement.appendChild(emptyState);
+    return;
+  }
+
+  lowItems.forEach((ingredient) => {
+    const row = document.createElement("div");
+    row.className = "low-stock-row";
+    row.innerHTML = `<span>${ingredient.label}</span><strong>${ingredient.percent}%</strong>`;
+    lowStockItemsElement.appendChild(row);
+  });
+}
+
 function renderShoppingSummary() {
   const values = ingredientCatalog.map((ingredient) => state.inventory[ingredient.key] ?? 100);
   const lowCount = values.filter((value) => value <= 25).length;
@@ -724,6 +791,7 @@ function renderShoppingSummary() {
   lowStockCountElement.textContent = String(lowCount);
   averageStockElement.textContent = `${average}%`;
   shoppingPreviewElement.textContent = lowItems.length > 0 ? `Conviene reponer pronto: ${lowItems.join(", ")}.` : "El stock se descuenta automaticamente cuando seleccionan comidas y despues se puede corregir a mano.";
+  renderLowStockPanel();
 }
 
 function render() {
@@ -790,6 +858,14 @@ addExpenseForm.addEventListener("submit", addExpense);
 addIngredientButton.addEventListener("click", addDraftIngredient);
 clearIngredientsButton.addEventListener("click", clearDraftIngredients);
 refillAllButton.addEventListener("click", refillAllInventory);
+lowStockCardElement.addEventListener("click", () => toggleLowStockPanel());
+lowStockCardElement.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    toggleLowStockPanel();
+  }
+});
+closeLowStockPanelButton.addEventListener("click", () => toggleLowStockPanel(false));
 
 render();
 initializeFirebaseSync();
