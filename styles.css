@@ -568,6 +568,33 @@ select {
   min-height: 180px;
 }
 
+.back-to-top {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(42, 35, 29, 0.9);
+  color: #fff8f0;
+  text-decoration: none;
+  font-size: 1.35rem;
+  font-weight: 800;
+  box-shadow: 0 16px 28px rgba(31, 22, 16, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  z-index: 30;
+  transition: transform 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.back-to-top:hover {
+  transform: translateY(-2px);
+  background: var(--brand);
+  box-shadow: 0 20px 32px rgba(126, 44, 24, 0.28);
+}
+
 @media (max-width: 920px) {
   .hero-grid,
   .content-grid,
