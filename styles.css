@@ -196,7 +196,8 @@ select {
 .ingredient-picker,
 .ingredient-suggestions,
 .form-actions,
-.expense-side {
+.expense-side,
+.expense-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -483,6 +484,36 @@ select {
   color: var(--accent);
 }
 
+.expense-alerts {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.expense-alert {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(138, 92, 22, 0.24);
+  background: rgba(244, 231, 196, 0.74);
+}
+
+.expense-alert p {
+  margin: 0;
+}
+
+.expense-alert-copy {
+  margin-top: 6px;
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.expense-alert-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
 .recipe-card,
 .history-item,
 .expense-item {
@@ -503,6 +534,15 @@ select {
 
 .recipe-main {
   flex: 1;
+}
+
+.expense-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.expense-actions {
+  justify-content: flex-end;
 }
 
 .priority-high {
