@@ -74,7 +74,7 @@
 
         <div class="actions">
           <button class="secondary-button" id="undo-button" type="button">Deshacer ultima seleccion</button>
-          <button class="secondary-button danger" id="reset-button" type="button">Reiniciar menu</button>
+          <button class="secondary-button danger" id="reset-button" type="button">Reiniciar rotacion</button>
         </div>
 
         <div class="content-grid">
@@ -176,6 +176,7 @@
             </div>
 
             <p class="balance-summary" id="expense-balance-summary">Todavia no hay gastos cargados.</p>
+            <div class="expense-alerts" id="expense-discrepancies" hidden></div>
 
             <div class="subpanel-head history-head">
               <p class="label">Ultimos gastos</p>
@@ -294,13 +295,17 @@
 
   <template id="expense-template">
     <article class="expense-item">
-      <div>
+      <div class="expense-main">
         <p class="history-title expense-description"></p>
         <p class="history-meta expense-meta"></p>
       </div>
       <div class="expense-side">
         <span class="history-turn expense-user"></span>
         <strong class="expense-amount"></strong>
+      </div>
+      <div class="expense-actions">
+        <button class="mini-button expense-edit-button" type="button">Editar</button>
+        <button class="mini-button expense-delete-button" type="button">Eliminar</button>
       </div>
     </article>
   </template>
