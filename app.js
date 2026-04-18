@@ -1,5 +1,7 @@
 ﻿const STORAGE_KEY = "menu-semanal-rotation-v5";
 const CURRENT_USER_KEY = "menu-semanal-current-user";
+const EXPENSE_BACKUP_KEY = "menu-semanal-expense-backup-v1";
+const EXPENSE_DISCREPANCIES_KEY = "menu-semanal-expense-discrepancies-v1";
 const MENU_REF_PATH = "menuSemanal/sharedState";
 const BLOCK_TURNS = 4;
 const USERS = ["SANTI", "JOAQUIN"];
@@ -109,13 +111,17 @@ const builtInExpenses = [
 const inventoryDefaults = Object.fromEntries(ingredientCatalog.map((item) => [item.key, 100]));
 const baseIngredientPool = Array.from(new Set(builtInRecipes.flatMap((recipe) => recipe.ingredients).map(normalizeIngredient).filter(Boolean))).sort((left, right) => left.localeCompare(right));
 
-const defaultState = {
-  history: [],
-  customRecipes: [],
-  pantryIngredients: baseIngredientPool,
-  expenses: builtInExpenses,
-  inventory: inventoryDefaults
-};
+function createDefaultState() {
+  return {
+    history: [],
+    customRecipes: [],
+    pantryIngredients: [...baseIngredientPool],
+    expenses: [...builtInExpenses],
+    inventory: { ...inventoryDefaults }
+  };
+}
+
+const defaultState = createDefaultState();
 
 const identitySantiButton = document.getElementById("identity-santi");
 const identityJoaquinButton = document.getElementById("identity-joaquin");
@@ -141,6 +147,7 @@ const addExpenseFeedbackElement = document.getElementById("add-expense-feedback"
 const spentSantiElement = document.getElementById("spent-santi");
 const spentJoaquinElement = document.getElementById("spent-joaquin");
 const expenseBalanceSummaryElement = document.getElementById("expense-balance-summary");
+const expenseDiscrepanciesElement = document.getElementById("expense-discrepancies");
 const expensesListElement = document.getElementById("expenses-list");
 const shoppingPreviewElement = document.getElementById("shopping-preview");
 const lowStockCountElement = document.getElementById("low-stock-count");
@@ -155,6 +162,7 @@ const closeLowStockPanelButton = document.getElementById("close-low-stock-panel"
 let state = loadCachedState();
 let currentUser = loadCurrentUser();
 let recipeDraftIngredients = [];
+let expenseDiscrepancies = loadExpenseDiscrepancies();
 let menuRef = null;
 let isHydratedFromRemote = false;
 let inventoryReorderPausedUntil = 0;
@@ -183,6 +191,9 @@ function prettifyIngredient(value) {
 }
 
 function clampPercent(value) {
+  if (!Number.isFinite(value)) {
+    return 100;
+  }
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
@@ -205,8 +216,8 @@ function setCurrentUser(user) {
   window.localStorage.setItem(CURRENT_USER_KEY, user);
   renderIdentity();
 }
-function buildRecipes() {
-  return [...builtInRecipes, ...state.customRecipes];
+function buildRecipes(sourceState = state) {
+  return [...builtInRecipes, ...sourceState.customRecipes];
 }
 
 function sanitizeRecipe(recipe) {
@@ -258,6 +269,113 @@ function mergeExpenses(...expenseLists) {
   return [...expenseMap.values()].sort((left, right) => left.createdAt.localeCompare(right.createdAt));
 }
 
+function serializeExpense(expense) {
+  return JSON.stringify({
+    id: expense.id,
+    amount: expense.amount,
+    description: expense.description,
+    paidBy: expense.paidBy,
+    createdAt: expense.createdAt
+  });
+}
+
+function sanitizeExpenseDiscrepancy(entry) {
+  if (!entry || typeof entry !== "object") {
+    return null;
+  }
+
+  const localExpense = sanitizeExpense(entry.localExpense);
+  const remoteExpense = sanitizeExpense(entry.remoteExpense);
+  const type = entry.type === "mismatch" ? "mismatch" : "missing-remote";
+
+  if (!localExpense) {
+    return null;
+  }
+
+  return {
+    id: typeof entry.id === "string" && entry.id.trim() ? entry.id.trim() : localExpense.id,
+    type,
+    localExpense,
+    remoteExpense,
+    detectedAt: typeof entry.detectedAt === "string" ? entry.detectedAt : new Date().toISOString()
+  };
+}
+
+function loadExpenseDiscrepancies() {
+  const rawValue = window.localStorage.getItem(EXPENSE_DISCREPANCIES_KEY);
+  if (!rawValue) {
+    return [];
+  }
+
+  try {
+    const parsedValue = JSON.parse(rawValue);
+    return Array.isArray(parsedValue) ? parsedValue.map(sanitizeExpenseDiscrepancy).filter(Boolean) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function persistExpenseDiscrepancies(discrepancies) {
+  const sanitized = Array.isArray(discrepancies) ? discrepancies.map(sanitizeExpenseDiscrepancy).filter(Boolean) : [];
+  expenseDiscrepancies = sanitized;
+  window.localStorage.setItem(EXPENSE_DISCREPANCIES_KEY, JSON.stringify(sanitized));
+}
+
+function removeExpenseDiscrepancy(expenseId) {
+  persistExpenseDiscrepancies(expenseDiscrepancies.filter((entry) => entry.id !== expenseId));
+}
+
+function buildExpenseDiscrepancies(localExpenses, remoteExpenses) {
+  const localMap = new Map((Array.isArray(localExpenses) ? localExpenses : []).map((expense) => [expense.id, expense]));
+  const remoteMap = new Map((Array.isArray(remoteExpenses) ? remoteExpenses : []).map((expense) => [expense.id, expense]));
+  const discrepancies = [];
+
+  localMap.forEach((localExpense, expenseId) => {
+    const remoteExpense = remoteMap.get(expenseId);
+    if (!remoteExpense) {
+      discrepancies.push({
+        id: expenseId,
+        type: "missing-remote",
+        localExpense,
+        remoteExpense: null,
+        detectedAt: new Date().toISOString()
+      });
+      return;
+    }
+
+    if (serializeExpense(localExpense) !== serializeExpense(remoteExpense)) {
+      discrepancies.push({
+        id: expenseId,
+        type: "mismatch",
+        localExpense,
+        remoteExpense,
+        detectedAt: new Date().toISOString()
+      });
+    }
+  });
+
+  return discrepancies.sort((left, right) => left.localExpense.createdAt.localeCompare(right.localExpense.createdAt));
+}
+
+function loadExpenseBackup() {
+  const savedBackup = window.localStorage.getItem(EXPENSE_BACKUP_KEY);
+  if (!savedBackup) {
+    return [];
+  }
+
+  try {
+    const parsedBackup = JSON.parse(savedBackup);
+    return Array.isArray(parsedBackup) ? parsedBackup.map(sanitizeExpense).filter(Boolean) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function persistExpenseBackup(expenses) {
+  const sanitized = Array.isArray(expenses) ? expenses.map(sanitizeExpense).filter(Boolean) : [];
+  window.localStorage.setItem(EXPENSE_BACKUP_KEY, JSON.stringify(sanitized));
+}
+
 function sanitizeInventory(rawInventory) {
   const inventory = {};
   ingredientCatalog.forEach((ingredient) => {
@@ -268,7 +386,7 @@ function sanitizeInventory(rawInventory) {
 
 function sanitizeState(rawState) {
   const customRecipes = Array.isArray(rawState?.customRecipes) ? rawState.customRecipes.map(sanitizeRecipe).filter(Boolean) : [];
-  const expenses = mergeExpenses(builtInExpenses, Array.isArray(rawState?.expenses) ? rawState.expenses.map(sanitizeExpense).filter(Boolean) : []);
+  const expenses = Array.isArray(rawState?.expenses) ? rawState.expenses.map(sanitizeExpense).filter(Boolean) : [];
 
   return {
     history: Array.isArray(rawState?.history)
@@ -287,37 +405,89 @@ function sanitizeState(rawState) {
 function loadCachedState() {
   const savedState = window.localStorage.getItem(STORAGE_KEY);
   if (!savedState) {
-    return structuredClone(defaultState);
+    return createDefaultState();
   }
 
   try {
     return sanitizeState(JSON.parse(savedState));
   } catch (error) {
-    return structuredClone(defaultState);
+    return createDefaultState();
   }
 }
 
 function persistLocalState() {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  persistExpenseBackup(state.expenses);
 }
 
-function persistState() {
-  persistLocalState();
+function commitStateMutation(mutator) {
+  if (!menuRef) {
+    state = sanitizeState(mutator(sanitizeState(state)));
+    persistLocalState();
+    render();
+    return Promise.resolve(state);
+  }
+
+  setSyncStatus("Sincronizando datos compartidos...");
+
+  return new Promise((resolve, reject) => {
+    menuRef.transaction(
+      (currentValue) => {
+        const currentState = currentValue ? sanitizeState(currentValue) : sanitizeState(state);
+        return sanitizeState(mutator(currentState));
+      },
+      (error, committed, snapshot) => {
+        if (error) {
+          setSyncStatus("Se guardo solo en este dispositivo. Revisa Firebase o tu conexion.", "warning");
+          reject(error);
+          return;
+        }
+
+        if (!committed) {
+          resolve(state);
+          return;
+        }
+
+        state = sanitizeState(snapshot?.val() || createDefaultState());
+        persistLocalState();
+        render();
+        setSyncStatus("Datos sincronizados entre dispositivos.");
+        resolve(state);
+      },
+      false
+    );
+  });
+}
+
+function seedRemoteStateFromLocalCache() {
   if (!menuRef) {
     return Promise.resolve();
   }
 
-  return menuRef.set(state)
-    .then(() => {
-      setSyncStatus("Datos sincronizados entre dispositivos.");
-    })
-    .catch(() => {
-      setSyncStatus("Se guardo solo en este dispositivo. Revisa Firebase o tu conexion.", "warning");
-    });
+  return new Promise((resolve, reject) => {
+    menuRef.transaction(
+      (currentValue) => currentValue || sanitizeState(state),
+      (error, committed, snapshot) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        if (committed && snapshot?.val()) {
+          state = sanitizeState(snapshot.val());
+          persistLocalState();
+          render();
+        }
+
+        resolve(snapshot?.val() || null);
+      },
+      false
+    );
+  });
 }
 
-function getRecipeById(recipeId) {
-  return buildRecipes().find((recipe) => recipe.id === recipeId);
+function getRecipeById(recipeId, sourceState = state) {
+  return buildRecipes(sourceState).find((recipe) => recipe.id === recipeId);
 }
 
 function getLastHistoryEntry(offset = 0) {
@@ -349,17 +519,17 @@ function getRecipeConsumption(recipe) {
   }, {});
 }
 
-function applyRecipeConsumption(recipe) {
+function applyRecipeConsumption(recipe, sourceState = state) {
   const consumption = getRecipeConsumption(recipe);
   Object.entries(consumption).forEach(([ingredientKey, percent]) => {
-    state.inventory[ingredientKey] = clampPercent((state.inventory[ingredientKey] ?? 100) - percent);
+    sourceState.inventory[ingredientKey] = clampPercent((sourceState.inventory[ingredientKey] ?? 100) - percent);
   });
 }
 
-function revertRecipeConsumption(recipe) {
+function revertRecipeConsumption(recipe, sourceState = state) {
   const consumption = getRecipeConsumption(recipe);
   Object.entries(consumption).forEach(([ingredientKey, percent]) => {
-    state.inventory[ingredientKey] = clampPercent((state.inventory[ingredientKey] ?? 100) + percent);
+    sourceState.inventory[ingredientKey] = clampPercent((sourceState.inventory[ingredientKey] ?? 100) + percent);
   });
 }
 
@@ -369,10 +539,16 @@ function selectRecipe(recipeId) {
     return;
   }
 
-  state.history.push({ recipeId, selectedAt: new Date().toISOString() });
-  applyRecipeConsumption(recipe);
-  render();
-  void persistState();
+  void commitStateMutation((draftState) => {
+    const draftRecipe = getRecipeById(recipeId, draftState);
+    if (!draftRecipe) {
+      return draftState;
+    }
+
+    draftState.history.push({ recipeId, selectedAt: new Date().toISOString() });
+    applyRecipeConsumption(draftRecipe, draftState);
+    return draftState;
+  });
 }
 
 function undoLastSelection() {
@@ -380,24 +556,32 @@ function undoLastSelection() {
     return;
   }
 
-  const lastEntry = state.history.pop();
-  const recipe = getRecipeById(lastEntry.recipeId);
-  if (recipe) {
-    revertRecipeConsumption(recipe);
-  }
-  render();
-  void persistState();
+  void commitStateMutation((draftState) => {
+    const lastEntry = draftState.history.pop();
+    if (!lastEntry) {
+      return draftState;
+    }
+
+    const recipe = getRecipeById(lastEntry.recipeId, draftState);
+    if (recipe) {
+      revertRecipeConsumption(recipe, draftState);
+    }
+
+    return draftState;
+  });
 }
 
 function resetState() {
-  state.history = [];
-  state.customRecipes = [];
-  state.pantryIngredients = [...baseIngredientPool];
-  state.expenses = [...builtInExpenses];
-  state.inventory = { ...inventoryDefaults };
+  const confirmed = window.confirm("Esto reinicia solo el historial y la rotacion de comidas compartidas. No borra gastos, recetas cargadas ni stock. Continuar?");
+  if (!confirmed) {
+    return;
+  }
+
   recipeDraftIngredients = [];
-  render();
-  void persistState();
+  void commitStateMutation((draftState) => {
+    draftState.history = [];
+    return draftState;
+  });
 }
 
 function scoreRecipe(recipe) {
@@ -587,14 +771,21 @@ function addRecipe(event) {
     return;
   }
 
-  state.customRecipes.push({ id: createRecipeId(title), title, ingredients: [...recipeDraftIngredients] });
-  state.pantryIngredients = mergeIngredientPools(state.pantryIngredients, recipeDraftIngredients);
-  recipeDraftIngredients = [];
-  addRecipeForm.reset();
-  addRecipeFeedbackElement.textContent = `Se agrego "${title}" a la lista compartida.`;
-  delete addRecipeFeedbackElement.dataset.tone;
-  render();
-  void persistState();
+  const nextRecipe = { id: createRecipeId(title), title, ingredients: [...recipeDraftIngredients] };
+  void commitStateMutation((draftState) => {
+    draftState.customRecipes.push(nextRecipe);
+    draftState.pantryIngredients = mergeIngredientPools(draftState.pantryIngredients, nextRecipe.ingredients);
+    return draftState;
+  }).then(() => {
+    recipeDraftIngredients = [];
+    addRecipeForm.reset();
+    addRecipeFeedbackElement.textContent = `Se agrego "${title}" a la lista compartida.`;
+    delete addRecipeFeedbackElement.dataset.tone;
+    render();
+  }).catch(() => {
+    addRecipeFeedbackElement.textContent = "No se pudo guardar la comida compartida. Revisa la conexion.";
+    addRecipeFeedbackElement.dataset.tone = "error";
+  });
 }
 
 function addExpense(event) {
@@ -613,12 +804,134 @@ function addExpense(event) {
     return;
   }
 
-  state.expenses = mergeExpenses(state.expenses, [{ id: `expense-${Date.now()}`, amount, description, paidBy: currentUser, createdAt: new Date().toISOString() }]);
-  addExpenseForm.reset();
-  addExpenseFeedbackElement.textContent = `Gasto guardado para ${currentUser}.`;
-  delete addExpenseFeedbackElement.dataset.tone;
-  render();
-  void persistState();
+  const nextExpense = {
+    id: `expense-${Date.now()}`,
+    amount,
+    description,
+    paidBy: currentUser,
+    createdAt: new Date().toISOString()
+  };
+
+  void commitStateMutation((draftState) => {
+    draftState.expenses = mergeExpenses(draftState.expenses, [nextExpense]);
+    return draftState;
+  }).then(() => {
+    addExpenseForm.reset();
+    addExpenseFeedbackElement.textContent = `Gasto guardado para ${currentUser}.`;
+    delete addExpenseFeedbackElement.dataset.tone;
+    render();
+  }).catch(() => {
+    addExpenseFeedbackElement.textContent = "No se pudo guardar el gasto compartido. Revisa la conexion antes de cerrar esta pagina.";
+    addExpenseFeedbackElement.dataset.tone = "error";
+  });
+}
+
+function promptExpenseEdition(expense) {
+  const nextDescription = window.prompt("Descripcion del gasto", expense.description);
+  if (nextDescription === null) {
+    return null;
+  }
+
+  const amountInput = window.prompt("Monto del gasto", String(expense.amount));
+  if (amountInput === null) {
+    return null;
+  }
+
+  const nextAmount = Number(String(amountInput).replace(",", "."));
+  if (!nextDescription.trim() || !Number.isFinite(nextAmount) || nextAmount <= 0) {
+    window.alert("La edicion se cancelo porque el monto o la descripcion no son validos.");
+    return null;
+  }
+
+  const paidByInput = window.prompt("Quien pago: SANTI o JOAQUIN", expense.paidBy);
+  if (paidByInput === null) {
+    return null;
+  }
+
+  const nextPaidBy = paidByInput.trim().toUpperCase();
+  if (!USERS.includes(nextPaidBy)) {
+    window.alert("Solo se admite SANTI o JOAQUIN.");
+    return null;
+  }
+
+  return {
+    ...expense,
+    amount: nextAmount,
+    description: nextDescription.trim(),
+    paidBy: nextPaidBy
+  };
+}
+
+function editExpense(expenseId) {
+  const currentExpense = state.expenses.find((expense) => expense.id === expenseId);
+  if (!currentExpense) {
+    return;
+  }
+
+  const updatedExpense = promptExpenseEdition(currentExpense);
+  if (!updatedExpense) {
+    return;
+  }
+
+  void commitStateMutation((draftState) => {
+    draftState.expenses = mergeExpenses(
+      draftState.expenses.map((expense) => (expense.id === expenseId ? updatedExpense : expense))
+    );
+    return draftState;
+  }).then(() => {
+    removeExpenseDiscrepancy(expenseId);
+    renderExpenses();
+  }).catch(() => {
+    window.alert("No se pudo editar el gasto compartido. Revisa la conexion.");
+  });
+}
+
+function deleteExpense(expenseId) {
+  const currentExpense = state.expenses.find((expense) => expense.id === expenseId);
+  if (!currentExpense) {
+    return;
+  }
+
+  const confirmed = window.confirm(`Se va a eliminar el gasto "${currentExpense.description}" por ${formatCurrency(currentExpense.amount)}. Continuar?`);
+  if (!confirmed) {
+    return;
+  }
+
+  void commitStateMutation((draftState) => {
+    draftState.expenses = draftState.expenses.filter((expense) => expense.id !== expenseId);
+    return draftState;
+  }).then(() => {
+    removeExpenseDiscrepancy(expenseId);
+    renderExpenses();
+  }).catch(() => {
+    window.alert("No se pudo eliminar el gasto compartido. Revisa la conexion.");
+  });
+}
+
+function acceptLocalExpenseDiscrepancy(expenseId) {
+  const discrepancy = expenseDiscrepancies.find((entry) => entry.id === expenseId);
+  if (!discrepancy) {
+    return;
+  }
+
+  void commitStateMutation((draftState) => {
+    draftState.expenses = mergeExpenses(
+      draftState.expenses.filter((expense) => expense.id !== expenseId),
+      [discrepancy.localExpense]
+    );
+    return draftState;
+  }).then(() => {
+    removeExpenseDiscrepancy(expenseId);
+    renderExpenses();
+  }).catch(() => {
+    window.alert("No se pudo aplicar la version local del gasto en Firebase.");
+  });
+}
+
+function acceptRemoteExpenseDiscrepancy(expenseId) {
+  removeExpenseDiscrepancy(expenseId);
+  persistExpenseBackup(state.expenses);
+  renderExpenses();
 }
 
 function getExpenseTotals() {
@@ -629,9 +942,62 @@ function getExpenseTotals() {
   }, { SANTI: 0, JOAQUIN: 0, total: 0 });
 }
 
+function describeExpenseDiscrepancy(entry) {
+  if (entry.type === "mismatch" && entry.remoteExpense) {
+    return `El gasto del ${formatDate(entry.localExpense.createdAt)} para "${entry.localExpense.description}" no coincide entre este dispositivo y Firebase.`;
+  }
+
+  return `El gasto del ${formatDate(entry.localExpense.createdAt)} para "${entry.localExpense.description}" existe en este dispositivo pero no aparece en Firebase.`;
+}
+
+function renderExpenseDiscrepancies() {
+  expenseDiscrepanciesElement.innerHTML = "";
+  expenseDiscrepanciesElement.hidden = expenseDiscrepancies.length === 0;
+
+  if (expenseDiscrepancies.length === 0) {
+    return;
+  }
+
+  expenseDiscrepancies.forEach((entry) => {
+    const wrapper = document.createElement("article");
+    wrapper.className = "expense-alert";
+
+    const label = document.createElement("p");
+    label.className = "label";
+    label.textContent = entry.type === "mismatch" ? "Revision pendiente" : "Gasto solo local";
+
+    const copy = document.createElement("p");
+    copy.className = "expense-alert-copy";
+    copy.textContent = describeExpenseDiscrepancy(entry);
+
+    const actions = document.createElement("div");
+    actions.className = "expense-alert-actions";
+
+    const keepLocalButton = document.createElement("button");
+    keepLocalButton.type = "button";
+    keepLocalButton.className = "mini-button";
+    keepLocalButton.textContent = entry.type === "mismatch" ? "Usar esta version" : "Subir a Firebase";
+    keepLocalButton.addEventListener("click", () => acceptLocalExpenseDiscrepancy(entry.id));
+
+    const keepRemoteButton = document.createElement("button");
+    keepRemoteButton.type = "button";
+    keepRemoteButton.className = "mini-button";
+    keepRemoteButton.textContent = entry.type === "mismatch" ? "Aceptar Firebase" : "Descartar local";
+    keepRemoteButton.addEventListener("click", () => acceptRemoteExpenseDiscrepancy(entry.id));
+
+    actions.appendChild(keepLocalButton);
+    actions.appendChild(keepRemoteButton);
+    wrapper.appendChild(label);
+    wrapper.appendChild(copy);
+    wrapper.appendChild(actions);
+    expenseDiscrepanciesElement.appendChild(wrapper);
+  });
+}
+
 function renderExpenses() {
   const expenseTemplate = document.getElementById("expense-template");
   expensesListElement.innerHTML = "";
+  renderExpenseDiscrepancies();
   if (state.expenses.length === 0) {
     const emptyState = document.createElement("p");
     emptyState.className = "empty-state";
@@ -646,6 +1012,8 @@ function renderExpenses() {
     fragment.querySelector(".expense-meta").textContent = formatDate(expense.createdAt);
     fragment.querySelector(".expense-user").textContent = expense.paidBy;
     fragment.querySelector(".expense-amount").textContent = formatCurrency(expense.amount);
+    fragment.querySelector(".expense-edit-button").addEventListener("click", () => editExpense(expense.id));
+    fragment.querySelector(".expense-delete-button").addEventListener("click", () => deleteExpense(expense.id));
     expensesListElement.appendChild(fragment);
   });
 }
@@ -681,21 +1049,25 @@ function scheduleInventoryReorder() {
 }
 
 function setInventoryLevel(key, value) {
-  state.inventory[key] = clampPercent(value);
   inventoryReorderPausedUntil = Date.now() + 10000;
   renderInventory();
   renderShoppingSummary();
   scheduleInventoryReorder();
-  void persistState();
+  void commitStateMutation((draftState) => {
+    draftState.inventory[key] = clampPercent(value);
+    return draftState;
+  });
 }
 
 function refillAllInventory() {
-  state.inventory = { ...inventoryDefaults };
   inventoryReorderPausedUntil = Date.now() + 10000;
   renderInventory();
   renderShoppingSummary();
   scheduleInventoryReorder();
-  void persistState();
+  void commitStateMutation((draftState) => {
+    draftState.inventory = { ...inventoryDefaults };
+    return draftState;
+  });
 }
 
 function getInventoryEntriesForRender() {
@@ -825,17 +1197,26 @@ function initializeFirebaseSync() {
       (snapshot) => {
         const remoteValue = snapshot.val();
         if (remoteValue) {
-          state = sanitizeState(remoteValue);
+          const expenseBackup = loadExpenseBackup();
+          const remoteState = sanitizeState(remoteValue);
+          persistExpenseDiscrepancies(buildExpenseDiscrepancies(expenseBackup, remoteState.expenses));
+          state = remoteState;
           persistLocalState();
           isHydratedFromRemote = true;
-          setSyncStatus("Datos sincronizados entre dispositivos.");
           render();
+
+          if (expenseDiscrepancies.length > 0) {
+            setSyncStatus("Hay gastos para revisar antes de decidir si se conserva la version local o Firebase.", "warning");
+            return;
+          }
+
+          setSyncStatus("Datos sincronizados entre dispositivos.");
           return;
         }
 
         if (!isHydratedFromRemote) {
           isHydratedFromRemote = true;
-          void persistState();
+          void seedRemoteStateFromLocalCache();
         }
       },
       () => {
