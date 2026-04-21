@@ -32,6 +32,24 @@ const ingredientAliasMap = {
   carne: "carne ternera"
 };
 
+const ingredientPriorityWeights = {
+  costeletas: 12,
+  pechuga: 12,
+  "carne ternera": 12,
+  papas: 4,
+  arroz: 4,
+  lentejas: 4,
+  arvejas: 4,
+  jardinera: 4,
+  choclo: 4,
+  picadillo: 4,
+  tomate: 2,
+  lechuga: 2,
+  cebolla: 1,
+  huevo: 1,
+  queso: 1
+};
+
 const recipeConsumptionById = {
   "pechuga-lentejas-huevo-cebolla": { pechuga: 13, lentejas: 25, huevo: 4, cebolla: 4 },
   "arroz-pollo-caldo-queso-cebolla": { arroz: 5, pechuga: 13, queso: 10, cebolla: 4 },
@@ -167,6 +185,8 @@ let menuRef = null;
 let isHydratedFromRemote = false;
 let inventoryReorderPausedUntil = 0;
 let inventoryReorderTimer = null;
+let inventoryFrozenOrderKeys = [];
+let inventoryPreviewOverrides = {};
 
 function normalizeIngredient(value) {
   return value.trim().toLowerCase();
@@ -584,6 +604,25 @@ function resetState() {
   });
 }
 
+function getIngredientPriorityWeight(ingredient) {
+  return ingredientPriorityWeights[ingredient] ?? 3;
+}
+
+function describeWeightedOverlap(overlap) {
+  return overlap.map((ingredient) => {
+    const weight = getIngredientPriorityWeight(ingredient);
+    return weight >= 10 ? `${ingredient} (clave)` : ingredient;
+  }).join(", ");
+}
+
+function calculateOverlapPenalty(overlap, basePenalty, multiplier) {
+  if (overlap.length === 0) {
+    return 0;
+  }
+
+  return basePenalty + overlap.reduce((total, ingredient) => total + getIngredientPriorityWeight(ingredient) * multiplier, 0);
+}
+
 function scoreRecipe(recipe) {
   const recentIngredients = new Set(getHistoryIngredients(0).map(normalizeTrackedIngredient));
   const olderIngredients = new Set(getHistoryIngredients(1).map(normalizeTrackedIngredient));
@@ -593,14 +632,14 @@ function scoreRecipe(recipe) {
 
   const recentOverlap = trackedIngredients.filter((ingredient) => recentIngredients.has(ingredient));
   if (recentOverlap.length > 0) {
-    score += 180 + recentOverlap.length * 18;
-    reasons.push(`Comparte con la ultima: ${recentOverlap.join(", ")}`);
+    score += calculateOverlapPenalty(recentOverlap, 90, 12);
+    reasons.push(`Comparte con la ultima: ${describeWeightedOverlap(recentOverlap)}`);
   }
 
   const olderOverlap = trackedIngredients.filter((ingredient) => olderIngredients.has(ingredient));
   if (olderOverlap.length > 0) {
-    score += 60 + olderOverlap.length * 10;
-    reasons.push(`Tambien se parece a otra reciente: ${olderOverlap.join(", ")}`);
+    score += calculateOverlapPenalty(olderOverlap, 35, 7);
+    reasons.push(`Tambien se parece a otra reciente: ${describeWeightedOverlap(olderOverlap)}`);
   }
 
   if (reasons.length === 0) {
@@ -1044,23 +1083,55 @@ function scheduleInventoryReorder() {
   const remainingMs = Math.max(0, inventoryReorderPausedUntil - Date.now());
   inventoryReorderTimer = window.setTimeout(() => {
     inventoryReorderTimer = null;
+    inventoryFrozenOrderKeys = [];
+    inventoryPreviewOverrides = {};
     renderInventory();
+    renderShoppingSummary();
   }, remainingMs + 20);
 }
 
-function setInventoryLevel(key, value) {
+function getEffectiveInventory() {
+  return {
+    ...state.inventory,
+    ...inventoryPreviewOverrides
+  };
+}
+
+function getSortedInventoryEntries(sourceInventory = state.inventory) {
+  return [...ingredientCatalog].sort((left, right) => {
+    const leftValue = sourceInventory[left.key] ?? 100;
+    const rightValue = sourceInventory[right.key] ?? 100;
+    return leftValue - rightValue || left.label.localeCompare(right.label);
+  });
+}
+
+function pauseInventoryReorderWithSnapshot(nextInventory) {
+  if (Date.now() >= inventoryReorderPausedUntil || inventoryFrozenOrderKeys.length === 0) {
+    inventoryFrozenOrderKeys = getInventoryEntriesForRender().map((ingredient) => ingredient.key);
+  }
+
+  inventoryPreviewOverrides = { ...nextInventory };
   inventoryReorderPausedUntil = Date.now() + 10000;
+}
+
+function setInventoryLevel(key, value) {
+  const nextInventory = {
+    ...getEffectiveInventory(),
+    [key]: clampPercent(value)
+  };
+
+  pauseInventoryReorderWithSnapshot(nextInventory);
   renderInventory();
   renderShoppingSummary();
   scheduleInventoryReorder();
   void commitStateMutation((draftState) => {
-    draftState.inventory[key] = clampPercent(value);
+    draftState.inventory[key] = nextInventory[key];
     return draftState;
   });
 }
 
 function refillAllInventory() {
-  inventoryReorderPausedUntil = Date.now() + 10000;
+  pauseInventoryReorderWithSnapshot({ ...inventoryDefaults });
   renderInventory();
   renderShoppingSummary();
   scheduleInventoryReorder();
@@ -1073,23 +1144,23 @@ function refillAllInventory() {
 function getInventoryEntriesForRender() {
   const entries = [...ingredientCatalog];
   if (Date.now() < inventoryReorderPausedUntil) {
-    return entries;
+    const entriesByKey = new Map(entries.map((ingredient) => [ingredient.key, ingredient]));
+    const frozenEntries = inventoryFrozenOrderKeys.map((key) => entriesByKey.get(key)).filter(Boolean);
+    const remainingEntries = entries.filter((ingredient) => !inventoryFrozenOrderKeys.includes(ingredient.key));
+    return [...frozenEntries, ...remainingEntries];
   }
 
-  return entries.sort((left, right) => {
-    const leftValue = state.inventory[left.key] ?? 100;
-    const rightValue = state.inventory[right.key] ?? 100;
-    return leftValue - rightValue || left.label.localeCompare(right.label);
-  });
+  return getSortedInventoryEntries(getEffectiveInventory());
 }
 
 function renderInventory() {
   const inventoryTemplate = document.getElementById("inventory-template");
+  const effectiveInventory = getEffectiveInventory();
   inventoryListElement.innerHTML = "";
 
   getInventoryEntriesForRender().forEach((ingredient) => {
     const fragment = inventoryTemplate.content.cloneNode(true);
-    const currentPercent = state.inventory[ingredient.key] ?? 100;
+    const currentPercent = effectiveInventory[ingredient.key] ?? 100;
     const item = fragment.querySelector(".inventory-item");
     const fill = fragment.querySelector(".inventory-fill");
 
@@ -1128,10 +1199,11 @@ function toggleLowStockPanel(forceOpen) {
 }
 
 function renderLowStockPanel() {
+  const effectiveInventory = getEffectiveInventory();
   const lowItems = ingredientCatalog
     .map((ingredient) => ({
       label: ingredient.label,
-      percent: state.inventory[ingredient.key] ?? 100
+      percent: effectiveInventory[ingredient.key] ?? 100
     }))
     .filter((ingredient) => ingredient.percent <= 25)
     .sort((left, right) => left.percent - right.percent || left.label.localeCompare(right.label));
@@ -1155,10 +1227,11 @@ function renderLowStockPanel() {
 }
 
 function renderShoppingSummary() {
-  const values = ingredientCatalog.map((ingredient) => state.inventory[ingredient.key] ?? 100);
+  const effectiveInventory = getEffectiveInventory();
+  const values = ingredientCatalog.map((ingredient) => effectiveInventory[ingredient.key] ?? 100);
   const lowCount = values.filter((value) => value <= 25).length;
   const average = Math.round(values.reduce((accumulator, value) => accumulator + value, 0) / values.length);
-  const lowItems = ingredientCatalog.filter((ingredient) => (state.inventory[ingredient.key] ?? 100) <= 25).map((ingredient) => ingredient.label);
+  const lowItems = ingredientCatalog.filter((ingredient) => (effectiveInventory[ingredient.key] ?? 100) <= 25).map((ingredient) => ingredient.label);
 
   lowStockCountElement.textContent = String(lowCount);
   averageStockElement.textContent = `${average}%`;
