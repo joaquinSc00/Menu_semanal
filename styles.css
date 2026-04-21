@@ -351,6 +351,45 @@ select {
   min-height: 96px;
 }
 
+.scroll-box {
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px dashed rgba(101, 77, 46, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.38);
+  min-height: 96px;
+  max-height: 620px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.recipes-scroll-box {
+  max-height: 680px;
+}
+
+.expenses-scroll-box {
+  max-height: 520px;
+}
+
+.scroll-box::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scroll-box::-webkit-scrollbar-track {
+  background: rgba(101, 77, 46, 0.08);
+  border-radius: 999px;
+}
+
+.scroll-box::-webkit-scrollbar-thumb {
+  background: rgba(156, 61, 36, 0.38);
+  border-radius: 999px;
+}
+
+.scroll-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 61, 36, 0.56);
+}
+
 .note,
 .identity-note,
 .sync-note[data-tone="warning"],
@@ -786,5 +825,11 @@ select {
 
   .note {
     text-align: left;
+  }
+
+  .scroll-box,
+  .recipes-scroll-box,
+  .expenses-scroll-box {
+    max-height: 55vh;
   }
 }
